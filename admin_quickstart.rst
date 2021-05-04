@@ -2,8 +2,8 @@
 Admin Quick Start
 =================
 
-This quick start gives an overview of installation of Singularity from
-source, a description of the architecture of Singularity, and
+This quick start gives an overview of installation of SingularityCE from
+source, a description of the architecture of SingularityCE, and
 pointers to configuration files. More information, including alternate
 installation options and detailed configuration options can be found
 later in this guide.
@@ -187,14 +187,14 @@ Download Singularity from a GitHub release
 ------------------------------------------
 
 You can download Singularity from one of the releases. To see a full list, visit
-`the GitHub release page <https://github.com/hpcng/singularity/releases>`_.
+`the GitHub release page <https://github.com/sylabs/singularity/releases>`_.
 After deciding on a release to install, you can run the following commands to
 proceed with the installation.
 
 .. code-block:: none
 
     $ export VERSION={InstallationVersion} && # adjust this as necessary \
-        wget https://github.com/hpcng/singularity/releases/download/v${VERSION}/singularity-${VERSION}.tar.gz && \
+        wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-${VERSION}.tar.gz && \
         tar -xzf singularity-${VERSION}.tar.gz && \
         cd singularity
 
