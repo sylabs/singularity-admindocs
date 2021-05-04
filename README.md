@@ -1,4 +1,4 @@
-# Singularity Admin Docs
+# SingularityCE Admin Docs
 
 This project uses [reStructured Text (RST)](http://docutils.sourceforge.net/rst.html)
 and [ReadTheDocs](https://readthedocs.org/). As a library for the current theme,
