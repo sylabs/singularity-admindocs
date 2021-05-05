@@ -3,7 +3,7 @@ version: 2.1
 executors:
   node:
     docker:
-      - image: node:11-slim
+      - image: node:16-slim
   python:
     docker:
       - image: python:3.6-buster
