@@ -6,7 +6,7 @@ executors:
       - image: node:16-slim
   python:
     docker:
-      - image: python:3.6-buster
+      - image: python:3.9-buster
 
 jobs:
   lint_markdown:
