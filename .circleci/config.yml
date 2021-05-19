@@ -38,7 +38,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Singularity submodule init
+          name: submodule init
           command: |
             git submodule update --init --recursive
       - run:

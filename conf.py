@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Singularity Container documentation build configuration file, created by
+# SingularityCE documentation build configuration file, created by
 # sphinx-quickstart on Tue Aug 26 14:19:49 2014.
 #
 # This file is execfile()d with the current directory set to its
@@ -44,15 +44,15 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'SingularityCE Admin Guide'
-author = u'SingularityCE Project Contributors'
-copyright = u'2017-2021, Sylabs Inc'
+author = u'SingularityCE  Project Contributors'
+copyright = u'2017-2021, Sylabs Inc & Project Contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = '3.7'
+version = '3.8'
 # We haven't had release specific docs posted for some time, so set release
 # same as version here.
 release = version
@@ -244,7 +244,7 @@ latex_logo = 'logo.png'
 
 # The title of the document. It defaults to the html_title option
 # but can be set independently for epub creation.
-epub_title = 'SingularityCE ' + version + ' Administrator Guide'
+epub_title = '{Singularity}  ' + version + ' Administrator Guide'
 
 # The author of the document. This is put in the Dublin Core metadata.
 # It defaults to the author option.
