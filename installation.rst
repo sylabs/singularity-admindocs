@@ -342,7 +342,7 @@ appropriate directory use these commands.
 .. code-block:: none
 
     $ git clone https://github.com/sylabs/singularity.git && \
-        cd {Singularity} && \
+        cd singularity && \
         git checkout v{InstallationVersion}
 
 Compile Singularity
