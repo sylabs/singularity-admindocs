@@ -304,7 +304,7 @@ with the installation.
     $ export VERSION={InstallationVersion} && # adjust this as necessary \
         wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-ce-${VERSION}.tar.gz && \
         tar -xzf singularity-ce-${VERSION}.tar.gz && \
-        cd singularity-ce-{$VERSION}
+        cd singularity-ce-${VERSION}
 
 Checkout Code from Git
 ======================
@@ -342,7 +342,7 @@ appropriate directory use these commands.
 .. code-block:: none
 
     $ git clone https://github.com/sylabs/singularity.git && \
-        cd {Singularity} && \
+        cd singularity && \
         git checkout v{InstallationVersion}
 
 Compile Singularity
