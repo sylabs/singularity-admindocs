@@ -6,7 +6,22 @@ executors:
       - image: node:16-slim
   python:
     docker:
-      - image: python:3.9-buster
+      - image: python:3.9-bullseye
+
+commands:
+  install-latex-apt:
+    steps:
+      - run:
+          name: Update package indexes
+          command: apt-get -q update
+      - run:
+          name: Install LaTeX environment
+          command: apt-get -q install -y texlive-latex-extra latexmk
+  install-deps-python:
+    steps:
+      - run:
+          name: Install python dependencies
+          command: pip install sphinx sphinx-rtd-theme rstcheck pygments
 
 jobs:
   lint_markdown:
@@ -24,10 +39,7 @@ jobs:
     executor: python
     steps:
       - checkout
-      - run:
-          name: Install sphinx
-          command: |
-            pip install sphinx sphinx-rtd-theme rstcheck pygments
+      - install-deps-python
       - run:
           name: Lint rst
           command: |
@@ -37,14 +49,7 @@ jobs:
     executor: python
     steps:
       - checkout
-      - run:
-          name: submodule init
-          command: |
-            git submodule update --init --recursive
-      - run:
-          name: Install sphinx
-          command: |
-            pip install sphinx sphinx-rtd-theme restructuredtext_lint pygments
+      - install-deps-python
       - run:
           name: make html
           command: |
@@ -57,15 +62,8 @@ jobs:
     executor: python
     steps:
       - checkout
-      - run:
-          name: Install sphinx
-          command: |
-            pip install sphinx sphinx-rtd-theme restructuredtext_lint pygments
-      - run:
-          name: Install TeXlive
-          command: |
-            apt-get update
-            apt-get install -f -y texlive-latex-extra latexmk
+      - install-deps-python
+      - install-latex-apt
       - run:
           name: make pdf
           command: |
