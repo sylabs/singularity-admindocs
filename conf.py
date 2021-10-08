@@ -52,7 +52,7 @@ copyright = u'2017-2021, Sylabs Inc & Project Contributors'
 # built documents.
 #
 # The short X.Y version.
-version = '3.8'
+version = '3.9'
 # We haven't had release specific docs posted for some time, so set release
 # same as version here.
 release = version
@@ -145,6 +145,9 @@ html_favicon = 'favicon.png'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['html/_static']
+
+# Custom bg color etc.
+html_css_files = ['css/custom.css']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
