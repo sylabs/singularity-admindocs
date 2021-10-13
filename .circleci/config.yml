@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  aws-cli: circleci/aws-cli@2.0.3
+
 executors:
   node:
     docker:
@@ -9,11 +12,13 @@ executors:
       - image: python:3.9-bullseye
 
 commands:
-  install-latex-apt:
+  apt-update:
     steps:
       - run:
           name: Update package indexes
           command: apt-get -q update
+  install-latex-apt:
+    steps:
       - run:
           name: Install LaTeX environment
           command: apt-get -q install -y texlive-latex-extra latexmk
@@ -43,12 +48,14 @@ jobs:
       - run:
           name: Lint rst
           command: |
-            rstcheck --report warning *.rst
+            rstcheck --ignore-language c,c++ --report warning *.rst
 
-  make_html:
+  make_docs:
     executor: python
     steps:
       - checkout
+      - apt-update
+      - install-latex-apt
       - install-deps-python
       - run:
           name: make html
@@ -57,13 +64,6 @@ jobs:
       - store_artifacts:
           path: _build/html
           destination: html
-
-  make_pdf_epub:
-    executor: python
-    steps:
-      - checkout
-      - install-deps-python
-      - install-latex-apt
       - run:
           name: make pdf
           command: |
@@ -79,15 +79,52 @@ jobs:
           path: _build/epub
           destination: epub
 
+  publish_docs:
+    executor: python
+    steps:
+      - checkout
+      - apt-update
+      - install-latex-apt
+      - install-deps-python
+      - run:
+          name: make html
+          command: |
+            make html
+      - run:
+          name: make latexpdf
+          command: |
+            make latexpdf
+      - run:
+          name: make epub
+          command: |
+            make epub
+      - aws-cli/setup
+      - run:
+          name: publish to s3
+          command: |
+            aws s3 sync _build/html s3://ce-docs.sylabs.io/guides/${CIRCLE_BRANCH}/admin-guide --delete
+            aws s3 cp _build/latex/*.pdf s3://ce-docs.sylabs.io/guides/${CIRCLE_BRANCH}/admin-guide.pdf
+            aws s3 cp _build/epub/*.epub s3://ce-docs.sylabs.io/guides/${CIRCLE_BRANCH}/admin-guide.epub
+
 workflows:
   version: 2
   build_and_test:
     jobs:
       - lint_markdown
       - check_rst
-      - make_html:
+      - make_docs:
           requires:
             - check_rst
-      - make_pdf_epub:
+          filters:
+            branches:
+              ignore:
+                - master
+                - /\d\.\d/
+      - publish_docs:
           requires:
             - check_rst
+          filters:
+            branches:
+              only:
+                - master
+                - /\d\.\d/
