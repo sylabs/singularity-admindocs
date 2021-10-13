@@ -1,15 +1,15 @@
-===========
-Admin Guide
-===========
+#############
+ Admin Guide
+#############
 
 Welcome to the {Singularity} Admin Guide!
 
 This guide aims to cover installation instructions, configuration
-detail, and other topics important to system adminstrators working
-with {Singularity}.
+detail, and other topics important to system adminstrators working with
+{Singularity}.
 
 See the `user guide
-<https://www.sylabs.io/guides/\{userversion\}/user-guide/>`__ for more
+<https://www.sylabs.io/guides/{userversion}/user-guide/>`__ for more
 information about how to use {Singularity}.
 
 .. toctree::
