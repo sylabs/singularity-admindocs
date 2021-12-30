@@ -322,13 +322,17 @@ It can currently:
 Requirements
 ============
 
-Some functionality of the plugin requires server-side API features that
-may not be available in older, but still supported, versions of
-Singularity Enterprise. In particular, token revocation requires
-token-service >=1.6.
+The enterprise plugin is designed for use with Singularity Enterprise
+2.0.1 or greater.
 
-Singularity Enterprise 2.0.1 or greater supports all operations that are
-implemented in the plugin.
+Some functionality is compatible with Singularity Enterprise 1.x, but
+not all features will be available.
+
+.. note::
+
+   The plugin supports entity / collection / container objects for
+   Singularity Enterprise 1.x,
+
 
 Installation
 ============
@@ -404,12 +408,27 @@ you to explore the plugin functionality:
    INFO:    Access Token Verified!
    INFO:    Token stored in /home/dtrudg/.singularity/remote.yaml
 
-   $ singularity enterprise get collections dtrudg-sylabs-2
-   Collection                    Description    Private Size
-   dtrudg-sylabs-2/default       No description false    26.4 MiB
-   dtrudg-sylabs-2/multiarch     No description false     5.2 MiB
-   dtrudg-sylabs-2/remote-builds No description false   209.5 MiB
-   dtrudg-sylabs-2/test          No description false    70.6 MiB
+   $ singularity enterprise get images library/default/ubuntu
+   ID                       Tags                   Arch    Description                Size     Signed Encrypted Uploaded
+   5baba99494feb900016ea434 [14.04]                amd64   No description             59.7 MiB false  false     true
+   5baba9b994feb900016ea436 [16.04]                amd64   No description             35.3 MiB false  false     true
+   5baba9d494feb900016ea438 []                     amd64   No description             26.7 MiB false  false     true
+   5baba9fb94feb900016ea43a [18.10]                amd64   No description             26.8 MiB false  false     true
+   5babaa1594feb900016ea43c []                     amd64   No description             26.7 MiB false  false     true
+   5ce86bc44fb0942d12f3d20d []                     amd64   No Description             35.4 MiB true   false     true
+   5ea0557e290c48bae3392b2e []                     amd64   No Description             55.4 MiB false  false     true
+   5ea055c8f0f8eb90a8a7b913 [19.10 eoan]           amd64   No Description             55.0 MiB false  false     true
+   5ea1e528c7eca47f070b1f22 []                     amd64   No Description             55.4 MiB false  false     true
+   5ea6eba8d0ff9c878fea57c2 []                     amd64   No Description             52.1 MiB false  false     true
+   61084029bc16537b1321c703 [bionic 18.04]         amd64   Ubuntu 18.04 LTS (bionic)  34.7 MiB true   false     true
+   6108406cff2db5ba27b5b875 [20.04 focal]          amd64   Ubuntu 20.04 LTS (focal)   35.0 MiB true   false     true
+   610840aebc16537b1321c705 [latest hirsute 21.04] amd64   Ubuntu 21.04 (hirsute)     35.5 MiB true   false     true
+   610861aebc16537b1321c71e [bionic 18.04]         ppc64le Ubuntu 18.04 LTS (bionic)  36.9 MiB true   false     true
+   6108653abc16537b1321c722 [focal 20.04]          ppc64le Ubuntu 20.04 LTS (focal)   38.9 MiB true   false     true
+   6108659bff2db5ba27b5b89c [18.04 bionic]         arm64   Ubuntu 18.04 LTS (bionic)  30.8 MiB true   false     true
+   610865c9ff2db5ba27b5b89e [focal 20.04]          arm64   Ubuntu 20.04 LTS (focal)   33.2 MiB true   false     true
+   610865f4d63fe43757fac6d9 [21.04 latest hirsute] arm64   Ubuntu 21.04 (hirsute)     33.9 MiB true   false     true
+   610866dfbc16537b1321c726 [latest 21.04 hirsute] ppc64le Ubuntu 21.04 (hirsute)     40.1 MiB true   false     true
 
 To use the plugin with a local Singularity Enterprise installation you
 should use ``singularity remote add`` to configure the endpoint and
@@ -482,9 +501,8 @@ Enterprise:
 
    Plural        Singular     Short     Item
    =======================================================================
-   entities      entity       ent     - Library entities
-   collections   collection   col     - Library collections
-   containers    container    con     - Library containers
+   projects      project      prj     - Library projects
+   repositories  repository   rep     - Library repositories
    images        image        img     - Library images
 
    builds        build        bld     - Remote builder builds
@@ -496,8 +514,19 @@ Enterprise:
    tokens        token        tok     - User authentication tokens
 
 You can use the plural, singular or short forms of each type
-interchangeably. ``get entities`` / ``get entity`` / ``get ent`` will
+interchangeably. ``get projects`` / ``get project`` / ``get prj`` will
 have the same effect.
+
+There is limited support for interrogating a Singularity Enterprise
+1.x library using the following types:
+
+.. code::
+
+   entities      entity       ent     - Library entities
+   collections   collection   col     - Library collections
+   containers    container    con     - Library containers
+   images        image        img     - Library images
+
 
 Output
 ^^^^^^
@@ -521,49 +550,34 @@ easily, e.g.:
 
 .. code::
 
-   $ singularity enterprise get --output csv entities > entities.csv
+   $ singularity enterprise get --output csv projects > projects.csv
 
-   $ singularity enterprise get --output json entities > entities.json
+   $ singularity enterprise get --output json projects > projects.json
 
-``get entities``
+``get projects``
 """"""""""""""""
 
-The ``get`` command for ``entities`` can be called as:
+The ``get`` command for ``projects`` can be called as:
 
--  ``singularity enterprise get entities`` to list all entities in the
+-  ``singularity enterprise get projects`` to list all projects in the
    Enterprise container library.
 
--  ``singularity enterprise get entities <entity ref>...`` to list
-   detail about the specified entities in the Enterprise container
+-  ``singularity enterprise get projects <project ref>...`` to list
+   detail about the specified projects in the Enterprise container
    library.
 
-``get collections``
-"""""""""""""""""""
-
-The ``get`` command for ``collections`` can be called as:
-
--  ``singularity enterprise get collections`` to list all visible
-   collections in the Enterprise container library.
-
--  ``singularity enterprise get collections <entity ref>`` to list all
-   collections under the specified entity in the Enterprise container
-   library.
-
--  ``singularity enterprise get entities <collection ref>...`` to list
-   detail about the specified collections in the Enterprise container
-   library.
-
-``get containers``
+``get repositories``
 """"""""""""""""""
 
-The ``get`` command for ``containers`` can be called as:
+The ``get`` command for ``repositories`` can be called as:
 
--  ``singularity enterprise get containers <collection ref>`` to list
-   all containers under the specified collection in the Enterprise
-   container library.
+-  ``singularity enterprise get repositories <repository path>`` to list
+   all repositories that begin with the specified path. E.g. specify
+   ``user1/hpc`` to list all repositories in the ``user1`` project,
+   that have a repository name beginning ``linux/``.
 
--  ``singularity enterprise get containers <container ref>...`` to list
-   detail about the specified containers in the Enterprise container
+-  ``singularity enterprise get containers <repository ref>...`` to list
+   detail about the specified repositories in the Enterprise container
    library.
 
 ``get images``
@@ -571,8 +585,8 @@ The ``get`` command for ``containers`` can be called as:
 
 The ``get`` command for ``images`` can be called as:
 
--  ``singularity enterprise get images <container ref>`` to list all
-   images under the specified container in the Enterprise container
+-  ``singularity enterprise get images <repository ref>`` to list all
+   images in the specified repository in the Enterprise container
    library.
 
 -  ``singularity enterprise get images <image ref>...`` to list detail
@@ -661,9 +675,8 @@ in Enterprise:
 
    Plural        Singular     Short     Item
    =======================================================================
-   entities      entity       ent     - Library entities
-   collections   collection   col     - Library collections
-   containers    container    con     - Library containers
+   projects      project      prj     - Library projects
+   repositories  repository   rep     - Library repositories
    images        image        img     - Library images
 
    builds        build        bld     - Remote builder builds
@@ -677,7 +690,7 @@ You must specify the reference / id of the item to display. E.g.:
 
 .. code::
 
-   $ singularity enterprise describe container library/linux/alpine
+   $ singularity enterprise describe repository library/linux/alpine
 
    $ singularity enterprise describe build 60d382812cde530fbbe5867e
 
