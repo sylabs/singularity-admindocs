@@ -13,7 +13,7 @@ def variableReplace(app, docname, source):
 # dictionary structure.
 variable_replacements = {
     # This is used in install instructions, so should be a full version
-    "{InstallationVersion}": "3.9.0-rc.3",
+    "{InstallationVersion}": "3.9.2",
     # The versions in the published guide URLs are for major.minor only
     "{adminversion}": "3.9",
     "{userversion}": "3.9",
@@ -23,7 +23,7 @@ variable_replacements = {
     # diverge a bit from CE<->PRO due to long-term backports etc.
     "{Singularity}": "SingularityCE",
     # Version of Go to be used in install instructions
-    "{GoVersion}": "1.17.2"
+    "{GoVersion}": "1.17.6"
 }
 
 
