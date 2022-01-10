@@ -81,7 +81,7 @@ In this mode *all* operations run as the user who starts the
    file provides.
 
 -  Replacing direct kernel mounts with a FUSE approach is likely to
-   cause a significant reduction in perfomance.
+   cause a significant reduction in performance.
 
 -  The effectiveness of signing and verifying container images is
    reduced as, when extracted to a directory, modification is possible
