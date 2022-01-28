@@ -291,8 +291,8 @@ mainstream-supported versions of RHEL and derivatives (e.g. Alma Linux
 LTS releases.
 
 These packages can be downloaded from the `GitHub release
-page<https://github.com/sylabs/singularity/releases>`_ and installed
-using your distribution's package manager.
+page <https://github.com/sylabs/singularity/releases>`_
+and installed using your distribution's package manager.
 
 The packages are provided as a convenience for users of the open
 source project, and are built in our public CircleCI workflow. They are not
