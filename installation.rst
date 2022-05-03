@@ -21,7 +21,7 @@ run with full privilege.
 System Requirements
 ===================
 
-{Singularity} requires ~140MiB disk space once compiled and installed.
+{Singularity} requires ~163MiB disk space once compiled and installed.
 
 There are no specific CPU or memory requirements at runtime, though 2GB
 of RAM is recommended when building from source.
