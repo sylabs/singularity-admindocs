@@ -125,37 +125,49 @@ dependencies:
 
 .. code:: sh
 
-   $ sudo yum update -y && \
-        sudo yum groupinstall -y 'Development Tools' && \
-        sudo yum install -y \
-        openssl-devel \
-        libuuid-devel \
-        libseccomp-devel \
-        wget \
-        squashfs-tools \
-        cryptsetup
+   # Install basic tools for compiling
+   sudo yum groupinstall -y 'Development Tools'
+   # Install RPM packages for dependencies
+   sudo yum install -y \
+      wget \
+      libseccomp-devel \
+      glib2-devel \
+      squashfs-tools \
+      cryptsetup \
+      runc
 
 On Ubuntu or Debian install the following dependencies:
 
 .. code:: sh
 
-   $ sudo apt-get update && sudo apt-get install -y \
-       build-essential \
-       uuid-dev \
-       libgpgme-dev \
-       squashfs-tools \
-       libseccomp-dev \
-       wget \
-       pkg-config \
-       git \
-       cryptsetup-bin
+   # Ensure repositories are up-to-date
+   sudo apt-get update
+   # Install debian packages for dependencies
+   sudo apt-get install -y \
+      wget \
+      build-essential \
+      libseccomp-dev \
+      libglib2.0-dev \
+      pkg-config \
+      squashfs-tools \
+      cryptsetup \
+      runc
+
+_Note - `runc` can be ommitted if you will not use the `singularity oci`
+commands._
 
 Install Go
 ==========
 
-{Singularity} v3 is written primarily in Go, and you will need Go 1.16
-or above installed to compile it from source. Versions of Go packaged by
-your distribution may not be new enough to build {Singularity}.
+{Singularity} v3 is written primarily in Go, and you will need Go installed to
+compile it from source. Versions of Go packaged by your distribution may not be
+new enough to build {Singularity}.
+
+{SingularityCE} aims to maintain support for the two most recent stable versions
+of Go. This corresponds to the Go `Release Maintenance
+Policy <https://github.com/golang/go/wiki/Go-Release-Cycle#release-maintenance>`_
+and `Security Policy <https://golang.org/security>`_, ensuring critical bug fixes
+and security patches are available for all supported language versions.
 
 The method below is one of several ways to `install and configure Go
 <https://golang.org/doc/install>`_.
@@ -181,13 +193,13 @@ instructions on go installation page).
        sudo tar -C /usr/local -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
        rm go$VERSION.$OS-$ARCH.tar.gz
 
-Then, set up your environment for Go.
+Finally, add ``/usr/local/go/bin`` to the ``PATH`` environment variable:
 
 .. code::
 
-   $ echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
-       echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
-       source ~/.bashrc
+   echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+   source ~/.bashrc
+
 
 Download {Singularity} from a GitHub release
 ============================================
@@ -248,6 +260,14 @@ some of the most common options that you may need to use when building
 -  ``-b``: Build {Singularity} in a given directory. By default this is
    ``./builddir``.
 
+- ``--without-conmon``: Do not build ``conmon``, a container monitor that is
+  used by the ``singularity oci`` commands. ``conmon`` is bundled with
+  {Singularity} and will be built and installed by default. Use
+  ``--without-conmon`` if you wish to use a version of ``conmon`` >=2.0.24 that
+  is provided by your distribution rather than the bundled version. You can also
+  specify ``--without-conmon`` if you know you will not use the ``singularity
+  oci`` commands.
+
 
 ************************************
  Installation from RPM/Deb Packages
@@ -270,11 +290,11 @@ signed, but SHA256 sums are provided on the release page.
  Configuration
 ***************
 
-{Singularity} is configured using files under ``etc/singularity`` in
-your ``--prefix``, or ``--syconfdir`` if you used that option with
-``mconfig``. In a default installation from source without a
-``--prefix`` set you will find them under
-``/usr/local/etc/singularity``. In a default installation from RPM or Deb packages you will find them under ``/etc/singularity``.
+{Singularity} is configured using files under ``etc/singularity`` in your
+``--prefix``, or ``--syconfdir`` if you used that option with ``mconfig``. In a
+default installation from source without a ``--prefix`` set you will find them
+under ``/usr/local/etc/singularity``. In a default installation from RPM or Deb
+packages you will find them under ``/etc/singularity``.
 
 You can edit these files directly, or using the ``{Singularity} config
 global`` command as the root user to manage them.
