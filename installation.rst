@@ -94,6 +94,9 @@ at runtime:
    binaries used to configure subuid/gid mappings for ``--fakeroot`` in
    non-setuid installs.
 
+- ``runc`` is the OCI runtime used for ``singularity oci`` commands, provided by
+  the ``runc`` package in all common Linux distributions.
+
 Bootstrap Utilities
 ^^^^^^^^^^^^^^^^^^^
 
@@ -320,44 +323,54 @@ dependencies:
 
 .. code:: sh
 
-   $ sudo yum update -y && \
-        sudo yum groupinstall -y 'Development Tools' && \
-        sudo yum install -y \
-        openssl-devel \
-        libuuid-devel \
-        libseccomp-devel \
-        wget \
-        squashfs-tools \
-        cryptsetup
+   # Install basic tools for compiling
+   sudo yum groupinstall -y 'Development Tools'
+   # Install RPM packages for dependencies
+   sudo yum install -y \
+      libseccomp-devel \
+      glib2-devel \
+      squashfs-tools \
+      cryptsetup \
+      runc
 
 On Ubuntu or Debian install the following dependencies:
 
 .. code:: sh
 
-   $ sudo apt-get update && sudo apt-get install -y \
-       build-essential \
-       uuid-dev \
-       libgpgme-dev \
-       squashfs-tools \
-       libseccomp-dev \
-       wget \
-       pkg-config \
-       git \
-       cryptsetup-bin
+   # Ensure repositories are up-to-date
+   sudo apt-get update
+   # Install debian packages for dependencies
+   sudo apt-get install -y \
+      build-essential \
+      libseccomp-dev \
+      libglib2.0-dev \
+      pkg-config \
+      squashfs-tools \
+      cryptsetup \
+      runc
 
 .. note::
 
-   You can build {Singularity} (3.5+) without ``cryptsetup`` available,
+   You can build {Singularity} without ``cryptsetup`` available,
    but will not be able to use encrypted containers without it installed
    on your system.
+
+   If you will not use the ``singularity oci`` commands, ``runc`` is not
+   required.
 
 .. _install-go:
 
 Install Go
 ----------
 
-{Singularity} v3 is written primarily in Go, and you will need Go 1.16
-or above installed to compile it from source.
+{Singularity} is written in Go, and aims to maintain support for the two most
+recent stable versions of Go. This corresponds to the Go Release Maintenance
+Policy and Security Policy, ensuring critical bug fixes and security patches are
+available for all supported language versions.
+
+Building {Singularity} may require a newer version of Go than is available in
+the repositories of your distribution. We recommend installing the latest
+version of Go from the [official binaries](https://golang.org/dl/).
 
 This is one of several ways to `install and configure Go
 <https://golang.org/doc/install>`_.
@@ -426,8 +439,8 @@ When installing from source, you can decide to install from either a
 -  **release branch**: A release branch represents the latest version of
    a minor release with all the newest bug fixes and enhancements (even
    those that have not yet made it into a point release). For instance,
-   to install v3.2 with the latest bug fixes and enhancements checkout
-   ``release-3.2``. Release branches may be less stable than code in a
+   to install v3.10 with the latest bug fixes and enhancements checkout
+   ``release-3.10``. Release branches may be less stable than code in a
    tagged point release.
 
 -  **master branch**: The ``master`` branch contains the latest,
@@ -441,9 +454,9 @@ appropriate directory use these commands.
 
 .. code::
 
-   $ git clone https://github.com/sylabs/singularity.git && \
+   $ git clone --recurse-submodules https://github.com/sylabs/singularity.git && \
        cd singularity && \
-       git checkout v{InstallationVersion}
+       git checkout --recurse-submodules v{InstallationVersion}
 
 Compile Singularity
 -------------------
@@ -495,6 +508,11 @@ some of the most common options that you may need to use when building
 
 -  ``-b``: Build {Singularity} in a given directory. By default this is
    ``./builddir``.
+
+-  ``--without-conmon``: Do not build the ``conmon`` OCI container monitor. Use
+   this option if you are certain you will not use the ``singularity oci``
+   commands, or wish to use conmon >=2.0.24 provided by your distribution, and
+   available on ``$PATH``.
 
 .. _install-nonsetuid:
 
@@ -660,7 +678,7 @@ library:
 .. code::
 
    $ singularity exec library://alpine cat /etc/alpine-release
-   3.9.2
+   3.10.0
 
 See the `user guide
 <https://www.sylabs.io/guides/{userversion}/user-guide/>`__ for more
