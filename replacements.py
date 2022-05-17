@@ -13,10 +13,10 @@ def variableReplace(app, docname, source):
 # dictionary structure.
 variable_replacements = {
     # This is used in install instructions, so should be a full version
-    "{InstallationVersion}": "master",
+    "{InstallationVersion}": "3.10.0",
     # The versions in the published guide URLs are for major.minor only
-    "{adminversion}": "master",
-    "{userversion}": "master",
+    "{adminversion}": "3.10",
+    "{userversion}": "3.10",
     # The 'Singularity' noun is now a replacement so we can have
     # {Singularity}  rather than bare 'Singularity'... and Sylabs can
     # replace to SingularityPRO so that it is clearer where docs
