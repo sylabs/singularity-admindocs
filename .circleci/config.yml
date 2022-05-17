@@ -119,7 +119,7 @@ workflows:
             branches:
               ignore:
                 - master
-                - /\d\.\d/
+                - /\d\.\d+/
       - publish_docs:
           requires:
             - check_rst
@@ -127,4 +127,4 @@ workflows:
             branches:
               only:
                 - master
-                - /\d\.\d/
+                - /\d\.\d+/
