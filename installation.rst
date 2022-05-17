@@ -429,7 +429,7 @@ will work for >=v{InstallationVersion}. To install an older tagged
 release see `older versions of the docs <https://www.sylabs.io/docs/>`_.
 
 When installing from source, you can decide to install from either a
-**tag**, a **release branch**, or from the **master branch**.
+**tag**, a **release branch**, or from the **main branch**.
 
 -  **tag**: GitHub tags form the basis for releases, so installing from
    a tag is the same as downloading and installing a `specific release
@@ -443,10 +443,10 @@ When installing from source, you can decide to install from either a
    ``release-3.10``. Release branches may be less stable than code in a
    tagged point release.
 
--  **master branch**: The ``master`` branch contains the latest,
+-  **main branch**: The ``main`` branch contains the latest,
    bleeding edge version of {Singularity}. This is the default branch
    when you clone the source code, so you don't have to check out any
-   new branches to install it. The ``master`` branch changes quickly and
+   new branches to install it. The ``main`` branch changes quickly and
    may be unstable.
 
 To ensure that the {Singularity} source code is downloaded to the
