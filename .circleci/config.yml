@@ -31,7 +31,7 @@ jobs:
       - run:
           name: Lint rst
           command: |
-            rstcheck --report warning *.rst
+            rstcheck --report-level warning *.rst
 
   make_html:
     executor: python
