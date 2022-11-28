@@ -88,6 +88,10 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Singularity submodule init
+          command: |
+            git submodule update --init --recursive
+      - run:
           name: Install sphinx
           command: |
             pip install sphinx sphinx-rtd-theme restructuredtext_lint pygments
