@@ -30,7 +30,7 @@ SLURM, SGE). Currently, the Singularity core software is installed on
 the following research clusters, meaning you can run Singularity
 containers as part of your jobs:
 
--  The `Sherlock cluster <http://sherlock.stanford.edu/>`__ at `Stanford
+-  The `Sherlock cluster <http://www.sherlock.stanford.edu/>`__ at `Stanford
    University <https://srcc.stanford.edu/>`__
 
 -  `SDSC Comet and
