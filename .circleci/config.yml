@@ -26,7 +26,7 @@ commands:
     steps:
       - run:
           name: Install python dependencies
-          command: pip install sphinx sphinx-rtd-theme rstcheck pygments
+          command: pip install 'sphinx<6' sphinx-rtd-theme rstcheck pygments
 
 jobs:
   lint_markdown:
@@ -48,7 +48,7 @@ jobs:
       - run:
           name: Lint rst
           command: |
-            rstcheck --ignore-language c,c++ --report warning *.rst
+            rstcheck --ignore-languages c,c++ --report-level warning *.rst
 
   make_docs:
     executor: python
