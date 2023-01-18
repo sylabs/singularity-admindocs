@@ -26,7 +26,7 @@ commands:
     steps:
       - run:
           name: Install python dependencies
-          command: pip install sphinx sphinx-rtd-theme rstcheck pygments
+          command: pip install 'sphinx<6' sphinx-rtd-theme rstcheck pygments
 
 jobs:
   lint_markdown:
