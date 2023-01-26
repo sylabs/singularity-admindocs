@@ -31,8 +31,10 @@ being root on the host outside.
 
 To allow unprivileged creation of user namespaces a kernel >=3.8 is
 required, with >=3.18 being recommended due to security fixes for user
-namespaces (3.18 also adds OverlayFS support which is used by
-Singularity).
+namespaces.
+
+To use a persistent overlay directory with ``--overlay`` when running
+unprivileged, a kernel >=5.11 is required.
 
 Additionally, some Linux distributions require that unprivileged user
 namespace creation is enabled using a ``sysctl`` or kernel command line
@@ -82,7 +84,7 @@ when running SIF container images:
    external modification of the container at runtime.
 
 -  Filesystem image, and SIF-embedded persistent overlays cannot be
-   used.
+   used. Directory overlays require kernel >=5.11.
 
 -  Encrypted containers cannot be used. {Singularity} mounts encrypted
    containers directly through the kernel, so that encrypted content is
@@ -390,3 +392,40 @@ user.
    # Entry is active
    $ cat /etc/subuid
    1000:4294836224:65536
+
+.. _proot:
+
+*********************************************
+ Unprivileged Builds Without User Namespaces
+*********************************************
+
+Where local container builds need to be performed unprivileged, but user
+namespaces and / or subuid mapping cannot be enabled, limited support is
+provided via the use of ``proot``. This functionality was introduced in
+{{Singularity}} 3.11.
+
+``proot`` is an optional dependency of {Singularity} that can be installed from
+community distribution repositories, or a static binary available from
+`proot-me.github.io <https://proot-me.github.io>`__. The ``proot`` executable
+should be on the ``PATH`` in order for {Singularity} to use it.
+
+When ``singularity build`` is run against a definition file by a non-root user,
+and without the ``--fakeroot`` option, {Singularity} will search the ``PATH``
+for ``proot``. If it is found, then the ``%post`` section of the build will run
+as an emulated root user. Commands run as the user who invoked ``singularity
+build``, but ``proot`` will intercept system calls, so that the commands appear
+to be running as root.
+
+Unprivileged builds with ``proot`` have limitations, as the emulation of the
+root user is not complete. These builds:
+
+- Do not support arch / debootstrap / yum / zypper bootstraps. Use localimage,
+  library, oras, or one of the docker/oci sources.
+- Do not support ``%pre`` and ``%setup`` sections.
+- Run the ``%post`` sections of a build in the container as an emulated root user.
+- Run the ``%test`` section of a build as the non-root user, like singularity test.
+- Are subject to any restrictions imposed in singularity.conf.
+- Incur a performance penalty due to proot's ptrace based interception of
+  syscalls.
+- May fail if the ``%post`` script requires privileged operations that proot cannot
+  emulate.

@@ -52,9 +52,9 @@ limits to accomplish this.
 ease-of-use on both single-user and shared systems. Notable security
 features include:
 
-   -  The user inside a container is the same as the user who ran the
-      container. This means access to files and devices from the
-      container is easily controlled with standard POSIX permissions.
+   -  The effective user inside a container is the same as the user who ran the
+      container. This means access to files and devices from the container is
+      easily controlled with standard POSIX permissions.
 
    -  Container filesystems are mounted ``nosuid`` and container
       applications run with the prctl ``NO_NEW_PRIVS`` flag set. This means
@@ -86,14 +86,37 @@ but :ref:`can be disabled <install-nonsetuid>` on build, or in the
 
 .. note::
 
-   Running {Singularity} in non-setuid mode requires unprivileged user
-   namespace support in the operating system kernel and does not support
-   all features, most notably direct mounts of SIF images. This impacts
-   integrity/security guarantees of containers at runtime.
+   Running {Singularity} in non-setuid mode requires unprivileged user namespace
+   support in the operating system kernel and does not support all features.
+   This impacts integrity/security guarantees of containers at runtime.
 
    See the :ref:`non-setuid installation section <install-nonsetuid>`
    for further detail on how to install {Singularity} to run in
    non-setuid mode.
+
+*******************
+ OCI Compatibility
+*******************
+
+{Singularity} allows users to run, and build from, the majority of OCI
+containers created with tools such as Docker. Beginning with {Singularity} 3.11,
+there are two modes of operation that support OCI containers in different ways.
+
+{Singularity}'s *native runtime*, used by default, supports all features that
+are exposed via the ``singularity`` command. It builds and runs containers in
+{Singularity}'s own on-disk formats. When an OCI container is pulled or built
+into a {Singularity} image, a translation step occurs. While most OCI images are
+supported as-is, there are some limitations and compatibility options may be
+required.
+
+{Singularity} 3.11's *experimental OCI runtime*, enabled with the ``--oci`` flag,
+runs containers using a low-level OCI runtime - either ``crun`` or ``runc``. The
+container is executed from a native OCI format on-disk. Not all CLI features are
+currently implemented, but OCI containers using the ``USER`` directive or which
+are otherwise incompatible with {Singularity}'s native runtime are better
+supported. This mode is considered experimental, ahead of full OCI support in
+version 4.0. Functionality may change across 3.11 patch releases of
+{Singularity}.
 
 **************************
  Installation from Source
