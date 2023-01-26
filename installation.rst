@@ -273,27 +273,28 @@ not support user-namespace (sub)uid/gid mapping.
 -  You should not run a sandbox container with ``--fakeroot`` from an
    NFS location.
 
-Lustre / GPFS
-^^^^^^^^^^^^^
+Lustre / GPFS / PanFS
+^^^^^^^^^^^^^^^^^^^^^
 
-Lustre and GPFS do not have sufficient ``upperdir`` or ``lowerdir``
-overlay support for certain {Singularity} features, and do not support
-user-namespace (sub)uid/gid mapping.
+Lustre, GPFS, and PanFS do not have sufficient ``upperdir`` or
+``lowerdir`` overlay support for certain {Singularity} features, and
+do not support user-namespace (sub)uid/gid mapping.
 
--  You cannot use ``-overlay`` or ``--writable-tmpfs`` with a sandbox
-   container that is located on a Lustre or GPFS filesystem. SIF
-   containers on Lustre / GPFS will work correctly with these options.
+- You cannot use ``--overlay`` or ``--writable-tmpfs`` with a sandbox
+  container that is located on a Lustre, GPFS, or PanFS
+  filesystem. SIF containers on Lustre, GPFS, and PanFS will work
+  correctly with these options.
 
--  You cannot use ``--overlay`` to overlay a directory onto a container,
-   when the overlay (upperdir) directory is on a Lustre or GPFS
-   filesystem.
+- You cannot use ``--overlay`` to overlay a directory onto a
+  container, when the overlay (upperdir) directory is on a Lustre,
+  GPFS, or PanFS filesystem.
 
--  When using ``--fakeroot`` to build or run a container, your
-   ``TMPDIR/SINGULARITY_TMPDIR`` should not be a Lustre or GPFS
-   location.
+- When using ``--fakeroot`` to build or run a container, your
+  ``TMPDIR/SINGULARITY_TMPDIR`` should not be a Lustre, GPFS, or
+  PanFS location.
 
--  You should not run a sandbox container with ``--fakeroot`` from a
-   Lustre or GPFS location.
+- You should not run a sandbox container with ``--fakeroot`` from a
+  Lustre, GPFS, or PanFS location.
 
 Install from Provided RPM / Deb Packages
 ========================================
