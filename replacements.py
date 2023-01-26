@@ -13,17 +13,17 @@ def variableReplace(app, docname, source):
 # dictionary structure.
 variable_replacements = {
     # This is used in install instructions, so should be a full version
-    "{InstallationVersion}": "main",
+    "{InstallationVersion}": "3.11.0",
     # The versions in the published guide URLs are for major.minor only
-    "{adminversion}": "main",
-    "{userversion}": "main",
+    "{adminversion}": "3.11",
+    "{userversion}": "3.11",
     # The 'Singularity' noun is now a replacement so we can have
     # {Singularity}  rather than bare 'Singularity'... and Sylabs can
     # replace to SingularityPRO so that it is clearer where docs
     # diverge a bit from CE<->PRO due to long-term backports etc.
     "{Singularity}": "SingularityCE",
     # Version of Go to be used in install instructions
-    "{GoVersion}": "1.18.1"
+    "{GoVersion}": "1.19.5"
 }
 
 
