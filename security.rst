@@ -73,15 +73,15 @@ namespaces. It can be compiled with the ``--without-setuid`` option, or
 In this mode *all* operations run as the user who starts the
 ``singularity`` program. However, there are some disadvantages:
 
--  SIF and other single file container images cannot be mounted
-   directly. The container image must be extracted to a directory on
-   disk to run. This impact the speed of execution. Workloads accessing
-   large numbers of small files (such as python application startup) do
-   not benefit from the reduced metadata load on the filesystem an image
-   file provides.
+-  SIF and other single file container images cannot be mounted directly, except
+   via the experimental ``--sif-fuse`` feature. The container image must be
+   extracted to a directory on disk to run. This impact the speed of execution.
+   Workloads accessing large numbers of small files (such as python application
+   startup) do not benefit from the reduced metadata load on the filesystem an
+   image file provides.
 
--  Replacing direct kernel mounts with a FUSE approach is likely to
-   cause a significant reduction in performance.
+-  Replacing direct kernel mounts with the experimental ``--sif-fuse`` FUSE
+   mount approach can cause a significant reduction in performance.
 
 -  The effectiveness of signing and verifying container images is
    reduced as, when extracted to a directory, modification is possible
@@ -96,6 +96,15 @@ In this mode *all* operations run as the user who starts the
    namespace code could have greater impact than vulnerabilities
    confined to a single piece of setuid software. Therefore they are
    reluctant to enable unprivileged user namespace creation.
+
+-  Limitations on container execution by location, valid signatures, user/group
+   cannot be enforced. Because there are numerous ways to bypass such
+   limitations when a user can make use of unprivileged user namespaces, and
+   install their own unprivileged copy of {Singularity}, setting limitations in
+   ``singularity.conf`` is not effective. Unprivileged installations allow users
+   to specify a ``singularity.conf`` at runtime via the ``--config`` flag, as a
+   convenience for certain workflows, and reflecting the inability to enforce
+   limitations. 
 
 Because of the points above, the default mode of operation of
 {Singularity} uses a setuid binary. Sylabs aims to reduce the
@@ -180,9 +189,9 @@ decrypted to disk in order to run it.
  Configuration & Runtime Options
 *********************************
 
-System administrators who manage {Singularity} can use configuration
-files to set security restrictions, grant or revoke a user’s
-capabilities, manage resources and authorize containers etc.
+System administrators who manage {Singularity} can use configuration files to
+set security restrictions, grant or revoke a user’s capabilities, manage
+resources and authorize containers etc.
 
 For example, the :ref:`Execution Control List <execution_control_list>` file
 allows restricting usage of SIF containers based on their signature

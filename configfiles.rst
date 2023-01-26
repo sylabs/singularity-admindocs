@@ -719,6 +719,9 @@ filesystem and by checking against a list of signing entities.
    types (squashfs/extfs/dir) via the ``singularity.conf`` file ``allow
    container`` settings.
 
+   In an unprivileged installation of {Singularity}, a user can specify their
+   own ``singularity.conf`` via ``--config``, and bypass ECL restrictions.
+
 .. code::
 
    [[execgroup]]

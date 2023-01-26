@@ -32,9 +32,14 @@ Full functionality of {Singularity} requires that the kernel supports:
    flexibility in bind mounts to containers, and to support persistent
    overlays for writable containers.
 
--  **Unprivileged user namespaces** - (minimum kernel >=3.8, >=3.18
-   recommended) Required to run containers without root or setuid
-   privilege.
+-  **Unprivileged user namespaces** - (minimum kernel >=3.8, >=3.18 recommended)
+   Required to run containers without root or setuid privilege. Required to
+   build containers unprivileged in ``--fakeroot`` mode. Required to run
+   containers using the experimental ``--oci`` mode.
+
+-  **Unprivileged overlay** - (minimum kernel >=5.11, >=5.13 recommended)
+   Required to use ``--overlay``, to mount a persistent overlay directory onto
+   the container, when running without root or setuid.
 
 External Binaries
 -----------------
