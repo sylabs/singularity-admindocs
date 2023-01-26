@@ -524,6 +524,10 @@ some of the most common options that you may need to use when building
    commands, or wish to use conmon >=2.0.24 provided by your distribution, and
    available on ``$PATH``.
 
+- ``--reproducible``: Enable support for reproducible builds. Ensures
+   that the compiled binaries do not include any temporary paths, the
+   source directory path, etc. This disables support for building plugins.
+
 .. _install-nonsetuid:
 
 Unprivileged (non-setuid) Installation
