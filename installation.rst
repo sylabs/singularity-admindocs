@@ -79,8 +79,8 @@ is left blank, then ``$PATH`` will be searched at runtime.
 Searching $PATH
 ^^^^^^^^^^^^^^^
 
-The following standard utilities are always found by searching ``$PATH``
-at runtime:
+The following utilities are always found by searching ``$PATH`` at
+runtime:
 
 -  ``true``
 
@@ -94,8 +94,18 @@ at runtime:
    binaries used to configure subuid/gid mappings for ``--fakeroot`` in
    non-setuid installs.
 
-- ``runc`` is the OCI runtime used for ``singularity oci`` commands, provided by
-  the ``runc`` package in all common Linux distributions.
+-  ``crun`` or ``runc`` are OCI runtimes used for the ``singularity
+   oci`` commands and experimental ``--oci`` mode for ``run / shell /
+   exec``. ``crun`` is preferred over ``runc`` if it is
+   available. ``runc`` is provided by a package in all common Linux
+   distributions. ``crun`` is packaged in more recent releases of
+   common Linux distributions.
+
+-  ``proot`` is an optional dependency that can be used to permit
+   limited unprivileged builds without user namespace / subuid
+   support. It is packaged in the community repositories for common
+   Linux distributions, and is available as a static binary from
+   `proot-me.github.io <https://proot-me.github.io>`__.
 
 Bootstrap Utilities
 ^^^^^^^^^^^^^^^^^^^
