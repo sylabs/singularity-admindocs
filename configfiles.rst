@@ -53,8 +53,8 @@ Options include:
 
 -  full: all capabilities are maintained, this gives the same behavior
    as the ``--keep-privs`` option.
--  file: only capabilities granted in
-   ``/usr/local/etc/singularity/capabilities/user.root`` are maintained.
+-  file: only capabilities granted for root in
+   ``etc/singularity/capability.json`` are maintained.
 -  no: no capabilities are maintained, this gives the same behavior as
    the ``--no-privs`` option.
 
@@ -267,6 +267,26 @@ types of image formats that can be leveraged by users with
    This behavior differs from {Singularity} versions before 3.9, where
    the ``allow container squashfs/extfs`` directives also applied to the
    filesystem embedded in a SIF image.
+
+Disabling Kernel Filesystem Mounts
+==================================
+
+When running in setuid mode, {Singularity} will mount extfs and squashfs
+filesystems using the kernel's filesystem drivers. These mounts are performed
+for standalone or SIF container images, overlay images or partitions,
+that use extfs or squashfs formats.
+
+Options in ``singularity.conf`` allow these mounts to be disabled, to e.g. work
+around a kernel vulnerability that cannot be patched in a timely manner. Note
+that disabling kernel mounts will result in a significant loss of functionality
+in setuid mode.
+
+``allow kernel squashfs``: Defaults to yes. When set to no, {Singularity} will not
+mount squashfs filesystems using the kernel squashfs driver.
+
+``allow kernel extfs``: Defaults to yes. When set to no, {Singularity} will not
+mount extfs filesystems using the kernel extfs driver.
+
 
 Networking Options
 ==================
