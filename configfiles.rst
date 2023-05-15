@@ -53,8 +53,8 @@ Options include:
 
 -  full: all capabilities are maintained, this gives the same behavior
    as the ``--keep-privs`` option.
--  file: only capabilities granted in
-   ``/usr/local/etc/singularity/capabilities/user.root`` are maintained.
+-  file: only capabilities granted for root in
+   ``etc/singularity/capability.json`` are maintained.
 -  no: no capabilities are maintained, this gives the same behavior as
    the ``--no-privs`` option.
 
