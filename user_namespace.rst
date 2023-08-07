@@ -15,13 +15,14 @@ container without privileged operations, and so that a normal user can
 act as root inside a container to perform administrative tasks, without
 being root on the host outside.
 
-{Singularity} uses user namespaces in 3 situations:
+{Singularity} uses user namespaces in the following situations:
 
 -  When the ``setuid`` workflow is disabled or {Singularity} was
    installed without root.
 -  When a container is run with the ``--userns`` option.
 -  When ``--fakeroot`` is used to impersonate a root user when building
    or running a container.
+-  When the `--oci` runtime mode is used.
 
 .. _userns-requirements:
 
