@@ -217,6 +217,23 @@ means users can specify bind points, scratch and tmp locations.
 Limiting Container Execution
 ============================
 
+.. warning::
+
+   If unprivileged user namespace creation is allowed on a system, a user can
+   supply and use their own unprivileged installation of Singularity or another
+   container runtime to bypass container limits. They may also be able to use
+   standard system tools such as ``unshare``, ``nsenter``, and FUSE mounts to
+   access / execute arbitrary containers without installing any runtime.
+
+   The 'limit container' and 'allow container' directives are not effective if
+   unprivileged user namespaces are enabled. They are only effectively applied
+   when Singularity is running using the native runtime in setuid mode, and
+   unprivileged container execution is not possible on the host.
+
+   **You must disable unprivileged user namespace creation on the host if you
+   rely on the these directives to limit container execution.** This will
+   disable OCI mode, which is unprivileged and cannot enforce these limits.
+
 There are several ways to limit container execution as an admin listed
 below. If stricter controls are required, check out the :ref:`Execution
 Control List <execution_control_list>`.
@@ -734,13 +751,27 @@ filesystem and by checking against a list of signing entities.
 
 .. warning::
 
+   If unprivileged user namespace creation is allowed on a system, a user can
+   supply and use their own unprivileged installation of Singularity or another
+   container runtime to bypass container limits. They may also be able to use
+   standard system tools such as ``unshare``, ``nsenter``, and FUSE mounts to
+   access / execute arbitrary containers without installing any runtime.
+
+   The ECL is not effective if unprivileged user namespaces are enabled. It is
+   only effectively applied when Singularity is running using the native runtime
+   in setuid mode, and unprivileged container execution is not possible on the
+   host.
+
+   **You must disable unprivileged user namespace creation on the host if you
+   rely on the ECL limit container execution.** This will disable OCI mode,
+   which is unprivileged and cannot enforce these limits.
+
+.. warning::
+
    The ECL configuration applies to SIF container images only. To lock
    down execution fully you should disable execution of other container
    types (squashfs/extfs/dir) via the ``singularity.conf`` file ``allow
    container`` settings.
-
-   In an unprivileged installation of {Singularity}, a user can specify their
-   own ``singularity.conf`` via ``--config``, and bypass ECL restrictions.
 
 .. code::
 
