@@ -1,4 +1,44 @@
-def variableReplace(app, docname, source):
+# def variableReplace(app, docname, source):
+#     """
+#     Takes the source on rst and replaces all the needed variables declared on
+#     variable_replacements structure
+#     """
+#     result = source[0]
+#     for key in app.config.variable_replacements:
+#         result = result.replace(key, app.config.variable_replacements[key])
+#     source[0] = result
+
+
+# # Add the needed variables to be replaced either on code or on text on the next
+# # dictionary structure.
+# variable_replacements = {
+#     # This is used in install instructions, so should be a full version
+#     "{InstallationVersion}": "main",
+#     # The versions in the published guide URLs are for major.minor only
+#     "{adminversion}": "main",
+#     "{userversion}": "main",
+#     # The 'Singularity' noun is now a replacement so we can have
+#     # {Singularity}  rather than bare 'Singularity'... and Sylabs can
+#     # replace to SingularityPRO so that it is clearer where docs
+#     # diverge a bit from CE<->PRO due to long-term backports etc.
+#     "{Singularity}": "SingularityCE",
+#     # Version of Go to be used in install instructions
+#     "{GoVersion}": "1.20.4"
+# }
+
+
+# def setup(app):
+#     app.add_config_value('variable_replacements', {}, True)
+#     app.connect('source-read', variableReplace)
+#     app.add_css_file('custom.css')
+
+
+
+
+from typing import List
+from sphinx.application import Sphinx
+
+def variableReplace(app: Sphinx, docname: str, source: List[str]):
     """
     Takes the source on rst and replaces all the needed variables declared on
     variable_replacements structure
@@ -8,26 +48,31 @@ def variableReplace(app, docname, source):
         result = result.replace(key, app.config.variable_replacements[key])
     source[0] = result
 
-
 # Add the needed variables to be replaced either on code or on text on the next
 # dictionary structure.
 variable_replacements = {
-    # This is used in install instructions, so should be a full version
     "{InstallationVersion}": "main",
-    # The versions in the published guide URLs are for major.minor only
     "{adminversion}": "main",
     "{userversion}": "main",
-    # The 'Singularity' noun is now a replacement so we can have
-    # {Singularity}  rather than bare 'Singularity'... and Sylabs can
-    # replace to SingularityPRO so that it is clearer where docs
-    # diverge a bit from CE<->PRO due to long-term backports etc.
     "{Singularity}": "SingularityCE",
-    # Version of Go to be used in install instructions
     "{GoVersion}": "1.20.4"
 }
 
-
-def setup(app):
+def setup(app: Sphinx):
     app.add_config_value('variable_replacements', {}, True)
     app.connect('source-read', variableReplace)
     app.add_css_file('custom.css')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
