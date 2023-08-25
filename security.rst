@@ -213,6 +213,23 @@ kernel. Unlike other container formats, an encrypted container is not
 decrypted to disk in order to run it.
 
 *********************************
+ Plugins
+*********************************
+
+As discussed in the {Singularity} User Guide, `plugins
+<https://sylabs.io/guides/{userversion}/user-guide/plugins.html>`_ provide a way
+to augment Singularity with additional functionality. Before using the
+``singularity plugin compile`` or ``singularity plugin install`` commands to
+compile or add a new plugin to your {Singularity} installation, make sure that
+you trust the origin of the plugin, and that you are certain it does not contain
+any malicious code.
+
+For further information on verifying the contents of SIF files using
+cryptographic signatures, see the `"Sign and Verify" section
+<https://sylabs.io/guides/{userversion}/user-guide/signNverify.html>`_ of the
+{Singularity} User Guide.
+
+*********************************
  Configuration & Runtime Options
 *********************************
 
