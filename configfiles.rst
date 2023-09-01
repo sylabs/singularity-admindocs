@@ -47,9 +47,9 @@ not function. Please see :ref:`Unprivileged Installations
 <userns-limitations>` for more information about running {Singularity}
 without ``setuid`` enabled.
 
-``root default capabilities``: {Singularity} allows the specification of
-capabilities kept by the root user when running a container by default.
-Options include:
+``root default capabilities``: In its default, non-OCI-mode, {Singularity}
+allows the specification of capabilities kept by default when the root user runs
+a container. Options include:
 
 -  full: all capabilities are maintained, this gives the same behavior
    as the ``--keep-privs`` option.
@@ -58,13 +58,16 @@ Options include:
 -  no: no capabilities are maintained, this gives the same behavior as
    the ``--no-privs`` option.
 
-.. note::
+The root user can modify the capabilities granted to individual containers when
+they are launched through the ``--add-caps`` and ``drop-caps`` flags.
 
-   The root user can manage the capabilities granted to individual
-   containers when they are launched through the ``--add-caps`` and
-   ``drop-caps`` flags. Please see `Linux Capabilities
-   <https://sylabs.io/guides/{userversion}/user-guide/security_options.html#linux-capabilities>`_
-   in the user guide for more information.
+In OCI-mode, {Singularity} follows the behavior of other OCI runtimes, and will
+always grant a default set of capabilities to the container. The ``root default
+capabilities`` option does not apply.
+
+Please see `Linux Capabilities
+<https://sylabs.io/guides/{userversion}/user-guide/security_options.html#linux-capabilities>`_
+in the user guide for more information.
 
 Loop Devices
 ============
@@ -940,9 +943,26 @@ configured in ``/etc/ld.so.conf`` (libraries).
  capability.json
 *****************
 
+Native runtime / non-OCI-Mode
+=============================
+
+In {Singularity}'s default configuration, without ``--oci``, a container started
+by root receives all capabilities, while a container started by a non-root user
+receives no capabilities.
+
+Additionally, {Singularity} provides support for granting and revoking Linux
+capabilities on a user or group basis. The ``capability.json`` file is
+maintained by {Singularity} in order to manage these capabilities. The
+``capability`` command group allows you to ``add``, ``drop``, and
+``list`` capabilities for users and groups.
+
 .. warning::
 
-   It is extremely important to recognize that **granting users Linux
+   In {Singularity}'s default setuid and non-OCI mode, containers are only
+   isolated in a mount namespace. A user namespace, which limits the scope of
+   capabilities, is not used by default.
+
+   Therefore, it is extremely important to recognize that **granting users Linux
    capabilities with the** ``capability`` **command group is usually
    identical to granting those users root level access on the host
    system**. Most if not all capabilities will allow users to "break
@@ -953,12 +973,6 @@ configured in ``/etc/ld.so.conf`` (libraries).
    option in multi-tenant HPC environments where an admin wants to grant
    a user special privileges within a container. For that and similar
    use cases, the :ref:`fakeroot feature <fakeroot>` is a better option.
-
-{Singularity} provides full support for admins to grant and revoke Linux
-capabilities on a user or group basis. The ``capability.json`` file is
-maintained by {Singularity} in order to manage these capabilities. The
-``capability`` command group allows you to ``add``, ``drop``, and
-``list`` capabilities for users and groups.
 
 For example, let us suppose that we have decided to grant a user (named
 ``pinger``) capabilities to open raw sockets so that they can use
@@ -1024,6 +1038,45 @@ For more information about individual Linux capabilities check out the
 `man pages <http://man7.org/linux/man-pages/man7/capabilities.7.html>`_
 or use the ``capability avail`` command to output available capabilities
 with a description of their behaviors.
+
+OCI-Mode
+========
+
+When containers are run in OCI-mode, by a non-root user, initialization is
+always performed inside a user namespace. The capabilities granted to a
+container are specific to this user namespace. For example, ``CAP_SYS_ADMIN``
+granted to an OCI-mode container does not give the user the ability to mount a
+filesystem outside of the container's user namespace.
+
+Because of this isolation of capabilities users can add and drop capabilities,
+using ``--add-caps`` and ``--drop-caps``, without the need for the administrator
+to have granted permission to do so with the ``singularity capabilities``
+command. The ``capability.json`` file is not consulted.
+
+OCI-mode containers do not inherit the user's own capabilities, but instead run
+with a default set of capabilities that matches other OCI runtimes.
+
+-  CAP_NET_RAW
+-	CAP_NET_BIND_SERVICE
+-	CAP_AUDIT_READ
+-	CAP_AUDIT_WRITE
+-	CAP_DAC_OVERRIDE
+-	CAP_SETFCAP
+-	CAP_SETPCAP
+-	CAP_SETGID
+-	CAP_SETUID
+-	CAP_MKNOD
+-	CAP_CHOWN
+-	CAP_FOWNER
+-	CAP_FSETID
+-	CAP_KILL
+-	CAP_SYS_CHROOT
+
+When the container is entered as the root user (e.g. with ``--fakeroot``), these
+default capabilities are added to the effective, permitted, and bounding sets.
+
+When the container is entered as a non-root user, these default capabilities are
+added to the bounding set.
 
 ******************
  seccomp-profiles
