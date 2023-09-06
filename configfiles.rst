@@ -88,7 +88,7 @@ particularly useful for MPI jobs.
 Default runtime (native vs. OCI)
 ================================
 
-Starting with version 4.0, {Singularity} a fully-supported OCI-mode, allowing
+Starting with version 4.0, {Singularity} includes a fully-supported OCI-mode, allowing
 you to run OCI containers using ``crun`` or ``runc`` as the low-level runtime,
 for true OCI runtime compatibility. (See the `OCI-mode section
 <https://sylabs.io/guides/{userversion}/user-guide/oci_runtime.html>`_ in the user
@@ -505,10 +505,10 @@ environment that does not support OCI-SIF (see the discussion of OCI-mode
 :ref:`above <sec:ocimode>`).
 
 Administrators who wish to disable this behavior, and prevent {Singularity} from
-extracting the contents of images to temporary sandbox dirs, do so by adding
+extracting the contents of images to temporary sandbox dirs, may do so by adding
 ``tmp sandbox = no`` to their configuration file:
 
-``tmp sandbox``: Allow extraction of image contents to temporary sandbox di.
+``tmp sandbox``: Allow extraction of image contents to temporary sandbox dir.
 (default: ``yes``)
 
 Experimental Options
