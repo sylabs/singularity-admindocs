@@ -126,6 +126,68 @@ distributions using their native tooling:
 -  ``uname``, ``zypper``, ``SUSEConnect`` for SLES derived RPM based
    distributions.
 
+Installing sqfstar / tar2sqfs for OCI-mode
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you intend to use the  `OCI mode
+<https://sylabs.io/guides/{userversion}/user-guide/oci_runtime.html>`_ of
+{Singularity}, your system must provide either:
+
+* ``squashfs-tools`` / ``squashfs`` >= 4.5, which provides the ``sqfstar``
+  utility. Note that older versions of these packages, provided by many
+  distributions, do not include ``sqfstar``.
+* ``squashfs-tools-ng``, which provides the ``tar2sqfs`` utility. This is not
+  packaged by all distributions.
+
+Below are instructions on how to obtain one of these two utilities on various
+distributions.
+
+Debian / Ubuntu
+"""""""""""""""
+
+On Debian/Ubuntu ``squashfs-tools-ng`` is available in the distribution
+repositories. It has been included in the :ref:`Install system dependencies
+<sec:sysdeps>` step above. No further action is necessary.
+
+Fedora
+""""""
+
+On Fedora, the ``squashfs-tools`` package, included in the :ref:`Install system
+dependencies <sec:sysdeps>` step above, includes `sqfstar`. No further action is
+necessary.
+
+RHEL / Alma Linux / Rocky Linux / CentOS
+""""""""""""""""""""""""""""""""""""""""
+
+On RHEL and derivatives, a COPR is available at:
+https://copr.fedorainfracloud.org/coprs/dctrud/squashfs-tools-ng/
+
+This COPR provides ``squashfs-tools-ng``, which will not replace any standard EL
+or EPEL packages. To use it:
+
+**EL 8 / 9:**
+
+.. code::
+
+  sudo dnf install dnf-plugins-core
+  sudo dnf copr enable dctrud/squashfs-tools-ng
+  sudo dnf install squashfs-tools-ng
+
+**EL 7:**
+
+.. code::
+
+  sudo yum install yum-plugin-copr
+  sudo yum copr enable dctrud/squashfs-tools-ng
+  sudo yum install squashfs-tools-ng
+
+SLES / openSUSE Leap
+""""""""""""""""""""
+
+On SLES/openSUSE, follow the instructions at the `filesystems
+project <https://software.opensuse.org//download.html?project=filesystems&package=squashfs>`_
+to obtain a more recent ``squashfs`` package, which provides ``sqfstar``.
+
 Non-standard ldconfig / Nix & Guix Environments
 -----------------------------------------------
 
