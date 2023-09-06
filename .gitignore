@@ -4,6 +4,7 @@
 
 .idea
 .DS_Store
+.vscode
 
 _build/
 __pycache__/

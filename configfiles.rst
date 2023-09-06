@@ -72,7 +72,8 @@ in the user guide for more information.
 Loop Devices
 ============
 
-{Singularity} uses loop devices to facilitate the mounting of container file systems from SIF and other images.
+{Singularity} uses loop devices to facilitate the mounting of container file
+systems from SIF and other images.
 
 ``max loop devices``: This option allows an admin to limit the total
 number of loop devices {Singularity} will consume at a given time.
@@ -81,6 +82,38 @@ number of loop devices {Singularity} will consume at a given time.
 to share a single loop device. This minimizes loop device usage and
 helps optimize kernel cache usage. Enabling this feature can be
 particularly useful for MPI jobs.
+
+.. _sec:ocimode:
+
+Default runtime (native vs. OCI)
+================================
+
+Starting with version 4.0, {Singularity} includes a fully-supported OCI-mode, allowing
+you to run OCI containers using ``crun`` or ``runc`` as the low-level runtime,
+for true OCI runtime compatibility. (See the `OCI-mode section
+<https://sylabs.io/guides/{userversion}/user-guide/oci_runtime.html>`_ in the user
+guide for more information.)
+
+By default, {Singularity} will use its native runtime unless the ``run`` /
+``shell`` / ``exec`` / ``pull`` commands are invoked with the ``--oci`` flag.
+However, administrators who wish to configure their installation of
+{Singularity} to use OCI-mode by default can do so by adding ``oci mode = yes``
+to their configuration file:
+
+``oci mode``: Enable OCI-mode by default. (default: ``no``)
+
+.. note::
+
+   By default, OCI-mode will attempt to use OCI-SIF images to locally store and
+   mount containers. (See the `discussion of OCI-SIF
+   <https://sylabs.io/guides/{userversion}/user-guide/oci_runtime.html#oci-sif-images>`_
+   in the user guide for more information.) If system does not meet the
+   requirements for using OCI-SIF, OCI mode will fall back to a filesystem-based
+   strategy: the OCI container will be unpacked into a temporary sandbox dir and
+   run from there.
+
+   Administrators who wish to disable this fallback behavior can do so via the
+   ``tmp sandbox = no`` option discussed :ref:`below <sec:tmpsandbox>`.
 
 Namespace Options
 =================
@@ -301,8 +334,8 @@ around a kernel vulnerability that cannot be patched in a timely manner. Note
 that disabling kernel mounts will result in a significant loss of functionality
 in setuid mode.
 
-``allow kernel squashfs``: Defaults to yes. When set to no, {Singularity} will not
-mount squashfs filesystems using the kernel squashfs driver.
+``allow kernel squashfs``: Defaults to yes. When set to no, {Singularity} will
+not mount squashfs filesystems using the kernel squashfs driver.
 
 ``allow kernel extfs``: Defaults to yes. When set to no, {Singularity} will not
 mount extfs filesystems using the kernel extfs driver.
@@ -459,6 +492,24 @@ Cgroups Options
 cgroups. Required (with cgroups v2) for unprivileged users to apply resource
 limits on containers. If set to ``no``, {Singularity} will directly manage
 cgroups via the cgroupfs.
+
+.. _sec:tmpsandbox:
+
+Disabling temporary sandbox dirs
+================================
+
+Some execution flows will extract the contents of an image into a temporary
+local sandbox dir prior to execution. Examples include: using a user namespace
+in native mode (by specifying ``--userns``), as well as using OCI-mode in an
+environment that does not support OCI-SIF (see the discussion of OCI-mode
+:ref:`above <sec:ocimode>`).
+
+Administrators who wish to disable this behavior, and prevent {Singularity} from
+extracting the contents of images to temporary sandbox dirs, may do so by adding
+``tmp sandbox = no`` to their configuration file:
+
+``tmp sandbox``: Allow extraction of image contents to temporary sandbox dir.
+(default: ``yes``)
 
 Experimental Options
 ====================
