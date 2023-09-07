@@ -145,16 +145,14 @@ distributions.
 Debian / Ubuntu
 """""""""""""""
 
-On Debian/Ubuntu ``squashfs-tools-ng`` is available in the distribution
-repositories. It has been included in the :ref:`Install system dependencies
-<sec:sysdeps>` step above. No further action is necessary.
+On Debian/Ubuntu, ``squashfs-tools-ng`` is available in the distribution
+repositories. No further action is necessary.
 
 Fedora
 """"""
 
-On Fedora, the ``squashfs-tools`` package, included in the :ref:`Install system
-dependencies <sec:sysdeps>` step above, includes `sqfstar`. No further action is
-necessary.
+On Fedora, the ``squashfs-tools`` package, available in the repositories,
+includes `sqfstar`. No further action is necessary.
 
 RHEL / Alma Linux / Rocky Linux / CentOS
 """"""""""""""""""""""""""""""""""""""""
@@ -867,21 +865,8 @@ Install the following programs:
 -  `Vagrant for Windows <https://www.vagrantup.com/downloads.html>`_
 -  `Vagrant Manager for Windows <http://vagrantmanager.com/downloads/>`_
 
-Mac
-===
-
-{Singularity} is available via Vagrant (installable with `Homebrew
-<https://brew.sh>`_ or manually)
-
-To use Vagrant via Homebrew:
-
-.. code::
-
-   $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-   $ brew install --cask virtualbox vagrant vagrant-manager
-
 {Singularity} Vagrant Box
-=========================
+-------------------------
 
 Run Git Bash (Windows) or open a terminal (Mac) and create and enter a
 directory to be used with your Vagrant VM.
@@ -920,7 +905,7 @@ Of course, you can also start with a plain OS Vagrant box as a base and
 then install {Singularity} using one of the above methods for Linux.
 
 {Singularity} Docker Image
-==========================
+--------------------------
 
 It is possible to use a Dockerized Singularity, here is a sample
 ``compose.yaml`` (Singularity version 3.7.4) for use with Docker
@@ -946,3 +931,124 @@ information see `issue#5
 <https://github.com/sylabs/singularity-admindocs/issues/5#issuecomment-852307931>`_
 and the image's source `repo
 <https://github.com/singularityhub/singularity-docker#use-cases>`_
+
+Mac
+===
+
+To install {Singularity} on macOS, we recommend using the `lima <https://github.com/lima-vm/lima>`__ VM platform, available on `Homebrew <https://brew.sh/>`__.
+
+If you don't already have Homebrew installed, you can install it as follows:
+
+.. code::
+
+   $ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+Follow the instructions at the end of the installation process. In particular,
+make sure to add the relevant lines to your shell configuration:
+
+.. code::
+
+   $ (echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> $HOME/.profile
+   $ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+Once Homebrew is installed, install lima:
+
+.. code::
+
+   $ brew install lima
+
+As part of the {Singularity} distribution (starting with version 4), we have
+provided an example template for using {Singularity} with lima. The example
+is available under the ``examples/lima`` directory in the {Singularity} source
+bundle, and can also be downloaded `directly from the code repository
+<https://raw.githubusercontent.com/sylabs/singularity/main/examples/lima/singularity-ce.yml>`_.
+
+The template is named ``singularity-ce.yml``, and:
+
+* Is based on AlmaLinux 9.
+* Supports both Intel and Apple Silicon (ARM64) Macs.
+* Installs the latest stable release of SingularityCE that has been published to
+  the Fedora EPEL repositories.
+
+Once you have obtained the template file, use it to start a lima VM:
+
+.. code::
+
+   $ limactl start ./singularity-ce.yml
+
+You will be presented with an interactive menu:
+
+.. code::
+
+   $ limactl start ./singularity-ce.yml
+   ? Creating an instance "singularity-ce"  [Use arrows to move, type to filter]
+   > Proceed with the current configuration
+     Open an editor to review or modify the current configuration
+     Choose another template (docker, podman, archlinux, fedora, ...)
+     Exit
+
+Choose the ``Proceed with the current configuration`` option, and lima will
+proceed to configure the VM according to the specifications in the template
+file. This can take a couple of minutes.
+
+Once lima is done with the configuration step, you can enter the VM
+interactively and run {Singularity} commands:
+
+.. code::
+
+   $ limactl shell singularity-ce
+   [myuser@lima-singularity-ce myuser]$ singularity run library://alpine
+   INFO:    Downloading library image
+   2.8MiB / 2.8MiB [==========================================================================================] 100 % 0.0 b/s 0s
+   Singularity> cat /etc/os-release
+   NAME="Alpine Linux"
+   ID=alpine
+   VERSION_ID=3.15.5
+   PRETTY_NAME="Alpine Linux v3.15"
+   HOME_URL="https://alpinelinux.org/"
+   BUG_REPORT_URL="https://bugs.alpinelinux.org/"
+   Singularity>
+
+Your home directory is shared into the lima VM by default. However, since
+macOS places home directories under ``/Users`` (rather than ``/home``),
+{Singularity} will not mount your home directory in the container unless you
+explicitly specify your macOS homedir, as shown here:
+
+.. code::
+
+   $ limactl shell singularity-ce
+   [myuser@lima-singularity-ce myuser]$ singularity run -H /Users/myuser library://alpine
+   INFO:    Using cached image
+   Singularity> ls
+   Applications Documents    Library      Music        Public
+   Desktop      Downloads    Movies       Pictures
+
+You can also run {Singularity} using lima directly from the macOS
+command-line:
+
+.. code::
+
+   $ limactl shell singularity-ce singularity run library://alpine
+   INFO:    Using cached image
+   Singularity>
+
+Or, with homedir mounting:
+
+.. code::
+
+   $ limactl shell singularity-ce singularity run -H /Users/myuser library://alpine
+   INFO:    Using cached image
+   Singularity>
+
+To stop the lima VM:
+
+.. code::
+
+   $ limactl stop singularity-ce
+
+To delete the lima VM:
+
+.. code::
+
+   $ limactl delete singularity-ce
+
