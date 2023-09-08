@@ -18,6 +18,8 @@ bare-metal or inside a Virtual Machine. Nested installations inside
 containers are not recommended, and require the outer container to be
 run with full privilege.
 
+.. _system-requirements:
+
 System Requirements
 ===================
 
@@ -35,7 +37,10 @@ Full functionality of {Singularity} requires that the kernel supports:
 -  **Unprivileged user namespaces** - (minimum kernel >=3.8, >=3.18 recommended)
    Required to run containers without root or setuid privilege. Required to
    build containers unprivileged in ``--fakeroot`` mode. Required to run
-   containers using the experimental ``--oci`` mode.
+   containers in OCI-mode (``-oci``).
+
+- **FUSE in unprivileged user namespaces** - (minimum kernel >=4.18) Required to
+  run containers in OCI-Mode (``-oci``).
 
 -  **Unprivileged overlay** - (minimum kernel >=5.11, >=5.13 recommended)
    Required to use ``--overlay``, to mount a persistent overlay directory onto
@@ -44,9 +49,22 @@ Full functionality of {Singularity} requires that the kernel supports:
 External Binaries
 -----------------
 
-Singularity depends on a number of external binaries for full
-functionality. From {Singularity} 3.9, the methods that are used to find
-these binaries have been standardized as below.
+Singularity depends on a number of external binaries for full functionality. The
+methods that are used to find these binaries have been standardized as below.
+
+Bundled Utilities
+^^^^^^^^^^^^^^^^^
+
+In a standard {Singularity} installation, the following are bundled and
+installed into {Singularity}'s ``libexec/bin`` directory. However, at
+compilation time ``mconfig`` options can be used to disable building these
+tools, in which case they will be searched for on ``$PATH`` at runtime.
+
+- ``squashfuse`` or ``squashfuse_ll`` are used to mount squashfs filesystems
+  from OCI-SIF images in OCI-mode.
+
+- ``conmon`` is used to manage monitoring and attaching to non-interactive
+  containers started with the ``singularity oci start`` command.
 
 Configurable Paths
 ^^^^^^^^^^^^^^^^^^
@@ -97,20 +115,29 @@ runtime:
 
 -  ``newuidmap`` and ``newgidmap`` are distribution provided setuid
    binaries used to configure subuid/gid mappings for ``--fakeroot`` in
-   non-setuid installs.
+   non-setuid installs, and in OCI-mode.
 
--  ``crun`` or ``runc`` are OCI runtimes used for the ``singularity
-   oci`` commands and experimental ``--oci`` mode for ``run / shell /
-   exec``. ``crun`` is preferred over ``runc`` if it is
-   available. ``runc`` is provided by a package in all common Linux
-   distributions. ``crun`` is packaged in more recent releases of
-   common Linux distributions.
+-  ``crun`` or ``runc`` are OCI runtimes used for the ``singularity oci``
+   commands and OCI-mode for ``run / shell / exec``. ``crun`` is preferred over
+   ``runc`` if it is available. ``runc`` is provided by a package in all common
+   Linux distributions. ``crun`` is packaged in more recent releases of common
+   Linux distributions.
 
 -  ``proot`` is an optional dependency that can be used to permit
    limited unprivileged builds without user namespace / subuid
    support. It is packaged in the community repositories for common
    Linux distributions, and is available as a static binary from
    `proot-me.github.io <https://proot-me.github.io>`__.
+
+- ``sqfstar`` or ``tar2sqfs`` are used in the creation of OCI-SIF images from
+  OCI sources, in OCI-mode (``--oci``).
+
+- ``fuse-overlayfs`` is used in OCI-mode to setup overlay filesystems when the
+  kernel does not support unprivileged overlay or the required overlay
+  configuration.
+
+- ``fusermount3`` or ``fusermount`` is used to unmount FUSE filesystems safely,
+  in OCI-mode and other flows.
 
 Bootstrap Utilities
 ^^^^^^^^^^^^^^^^^^^
@@ -262,12 +289,12 @@ containers only. A SIF container is mounted into the ``--localstatedir``
 location, which should generally be on a local filesystem that supports
 overlay.
 
-Fakeroot / (sub)uid/gid mapping
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Fakeroot & OCI-Mode subuid/gid mapping
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When {Singularity} is run using the :ref:`fakeroot <fakeroot>` option it
-creates a user namespace for the container, and UIDs / GIDs in that user
-namespace are mapped to different host UID / GIDs.
+When {Singularity} is run using the :ref:`fakeroot <fakeroot>` option, or in
+OCI-Mode, it creates a user namespace for the container, and UIDs / GIDs in that
+user namespace are mapped to different host UID / GIDs.
 
 Most local filesystems (ext4/xfs etc.) support this uid/gid mapping in a
 user namespace.

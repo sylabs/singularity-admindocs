@@ -109,14 +109,12 @@ into a {Singularity} image, a translation step occurs. While most OCI images are
 supported as-is, there are some limitations and compatibility options may be
 required.
 
-{Singularity} 3.11's *experimental OCI runtime*, enabled with the ``--oci`` flag,
+{Singularity} 4's OCI-mode, enabled with the ``--oci`` flag,
 runs containers using a low-level OCI runtime - either ``crun`` or ``runc``. The
 container is executed from a native OCI format on-disk. Not all CLI features are
 currently implemented, but OCI containers using the ``USER`` directive or which
 are otherwise incompatible with {Singularity}'s native runtime are better
-supported. This mode is considered experimental, ahead of full OCI support in
-version 4.0. Functionality may change across 3.11 patch releases of
-{Singularity}.
+supported. Note that OCI-mode has additional :ref:`system requirements <system-requirements>`.
 
 **************************
  Installation from Source
