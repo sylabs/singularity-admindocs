@@ -32,43 +32,141 @@ security fixes as detailed in the `Sylabs Security Policy
  Background
 ************
 
-{Singularity} grew out of the need to implement a container platform
-that was suitable for use on shared systems, such as HPC clusters. In
-these environments multiple people access a shared resource. User
-accounts, groups, and standard file permissions limit their access to
-data, devices, and prevent them from disrupting or accessing others'
-work.
+{Singularity} grew out of the need to implement a container platform that was
+suitable for use on shared systems, such as HPC clusters. In these environments
+multiple people access a shared resource. User accounts, groups, and standard
+file permissions limit their access to data, devices, and prevent them from
+disrupting or accessing others' work.
 
-To provide security in these environments a container needs to run as
-the user who starts it on the system. Before the widespread adoption of
-the Linux user namespace, only a privileged user could perform the
-operations which are needed to run a container. A default Docker
-installation uses a root-owned daemon to start containers. Users can
-request that the daemon starts a container on their behalf. However,
-coordinating a daemon with other schedulers is difficult and, since the
-daemon is privileged, users can ask it to carry out actions that they
-wouldn't normally have permission to do.
+To provide security in these environments a container needs to run as the user
+who starts it on the system. Before the widespread adoption of the Linux user
+namespace, only a privileged user could perform the operations which are needed
+to run a container. A default Docker installation uses a root-owned daemon to
+start containers. Users can ask the daemon to start a container on their behalf.
+However, coordinating a daemon with other job-scheduling software is difficult
+and, since the daemon is privileged, users can ask it to carry out actions that
+they wouldn't normally have permission to do.
 
-When a user runs a container with {Singularity}, it is started as a
-normal process running under the user's account. Standard file
-permissions and other security controls based on user accounts, groups,
-and processes apply. In a default installation {Singularity} uses a
-setuid starter binary to perform only the specific tasks needed to setup
-the container.
+When a user runs a container with {Singularity}, by default it is started as a
+normal process running under the user's account. Standard file permissions and
+other security controls based on user accounts, groups, and processes apply.
 
-**************************
- Setuid & User Namespaces
-**************************
+The exact way in which a container is configured and executed depends on whether
+it is run:
 
-Using a setuid binary to run container setup operations is essential to
-support containers on older Linux distributions, such as CentOS 6, that
-were previously common in HPC and enterprise. Newer distributions have
-support for 'unprivileged user namespace creation'. This means a normal
-user can create a user namespace, in which most setup operations needed
-to run a container can be run unprivileged.
+- Using the default native runtime, in setuid mode.
+- Using the native runtime, in non-setuid / unprivileged mode.
+- In OCI-mode.
 
-Security Implications of Unprivileged User Namespaces
-=====================================================
+************************
+ Default Native Runtime
+************************
+
+When a container is run with the default native runtime (not OCI-mode), a
+standard installation of {Singularity} will use a setuid root starter executable
+for container setup. Optionally, {Singularity} can be built or configured to run
+unprivileged. Unprivileged execution performs container setup within an
+unprivileged user namespace.
+
+Setuid Mode
+===========
+
+Using a setuid binary to run container setup operations was essential to support
+containers on older Linux distributions, such as CentOS 6, that were previously
+common in HPC and enterprise.
+
+On more modern distributions, where unprivileged user namespace creation is
+permitted, setuid mode is still used by default because:
+
+- Many HPC sites disable unprivileged user namespace creation due to their
+  specific security risk model, or restrictions on kernel updates.
+- Full support for using supplementary groups from the host system is not
+  possible within user namespaces, impacting creation of files in some
+  filesystem layouts that are common for large shared projects.
+- There are preformance advantages for filesystem mounts performed via the
+  kernel, instead of in userspace with FUSE.
+- Privileged operations are required to handle LUKS2 encrypted containers.
+- Privileged operations are required for container network configuration using
+  Container Network Interface (CNI) plugins.
+- Setuid mode allows execution limits configured by an administrator to be
+  enforced, on systems where unprivileged user namespace creation is disabled.
+
+To safely execute containers in setuid mode, {Singularity} uses a number of
+Linux kernel features. The container file system is mounted using the ``nosuid``
+option, and processes are started with the ``PR_NO_NEW_PRIVS`` flag set. This
+means that even if you run ``sudo`` inside your container, you won't be able to
+change to another user, or gain root privileges by other means.
+
+If you do require the additional isolation of the network, devices, PIDs
+etc. provided by other runtimes, {Singularity} can make use of
+additional namespaces and functionality such as seccomp and cgroups.
+
+Unprivileged / User Namespace Mode
+==================================
+
+{Singularity} supports running containers without setuid, using user namespaces.
+It can be compiled with the ``--without-setuid`` option, or ``allow setuid =
+no`` can be set in ``singularity.conf`` to disable setuid mode and execute all
+containers via a user namespace. With this configuration, all container setup
+operations run as the user who starts the ``singularity`` program. However,
+there are some disadvantages:
+
+-  SIF and other single file container images cannot be mounted directly, except
+   via the experimental ``--sif-fuse`` feature. The container image must be
+   extracted to a directory on disk to run. This impacts the speed of execution.
+   Workloads accessing large numbers of small files (such as python application
+   startup) do not benefit from the reduced metadata load on the filesystem that
+   using an image file normally provides.
+
+-  Replacing direct kernel mounts with the experimental ``--sif-fuse`` FUSE
+   mount approach can cause a significant reduction in performance.
+
+-  The effectiveness of signing and verifying container images is
+   reduced as, when extracted to a directory, modification is possible
+   and verification of the image's original signature cannot be
+   performed.
+
+-  Encryption is not supported. {Singularity} leverages kernel LUKS2
+   mounts to run encrypted containers without decrypting their content
+   to disk.
+
+-  Some sites hold the opinion that vulnerabilities in kernel user
+   namespace code could have greater impact than vulnerabilities
+   confined to a single piece of setuid software. Therefore they are
+   reluctant to enable unprivileged user namespace creation.
+
+-  Limitations on container execution by location, valid signatures, user/group
+   cannot be enforced.
+
+Because of the points above, the default mode of operation of
+{Singularity} uses a setuid binary. Sylabs aims to reduce the
+circumstances that require this as new functionality is developed and
+reaches commonly deployed Linux distributions.
+
+********
+OCI-Mode
+********
+
+In OCI-Mode (``--oci``), {Singularity} always performs container setup within a
+user namespace. The setuid starter executable is not used, even when ``allow
+setuid = yes`` is set in ``singularity.conf``.
+
+Containers can be run directly from SIF files as long as the kernel is new
+enough to support FUSE mounts from user namespaces. Otherwise containers will be
+extracted to a directory before execution (unless this option
+:ref:`has been disabled <sec:tmpsandbox>`).
+
+Unprivileged users executing a container in OCI-Mode can access other uid/gids,
+can disable the ``nosuid`` flag on container mounts, and can grant capabilities
+to the container. However, these actions are always limited to the scope of the
+user namespace in which the container is created. On the host, all operations
+are mapped to the user's own uid/gid or those in the subuid/subgid map that an
+administrator has configured for the user. Increased capabilities, and other
+expanded permissions, do not apply outside of the container on the host.
+
+*******************************************************
+ Security Implications of Unprivileged User Namespaces
+*******************************************************
 
 .. warning::
 
@@ -96,79 +194,6 @@ user namespaces are available.
 If your primary security concern is that of restricting the containers which
 users can execute, you should use singularity in setuid mode, and ensure
 unprivileged user namespace creation is disabled on the host.
-
-Configuration and Limitations of User Namespace Mode
-====================================================
-
-{Singularity} supports running containers without setuid, using user
-namespaces. It can be compiled with the ``--without-setuid`` option, or
-``allow setuid = no`` can be set in ``singularity.conf`` to enable this.
-In this mode *all* operations run as the user who starts the
-``singularity`` program. However, there are some disadvantages:
-
--  SIF and other single file container images cannot be mounted directly, except
-   via the experimental ``--sif-fuse`` feature. The container image must be
-   extracted to a directory on disk to run. This impact the speed of execution.
-   Workloads accessing large numbers of small files (such as python application
-   startup) do not benefit from the reduced metadata load on the filesystem an
-   image file provides.
-
--  Replacing direct kernel mounts with the experimental ``--sif-fuse`` FUSE
-   mount approach can cause a significant reduction in performance.
-
--  The effectiveness of signing and verifying container images is
-   reduced as, when extracted to a directory, modification is possible
-   and verification of the image's original signature cannot be
-   performed.
-
--  Encryption is not supported. {Singularity} leverages kernel LUKS2
-   mounts to run encrypted containers without decrypting their content
-   to disk.
-
--  Some sites hold the opinion that vulnerabilities in kernel user
-   namespace code could have greater impact than vulnerabilities
-   confined to a single piece of setuid software. Therefore they are
-   reluctant to enable unprivileged user namespace creation.
-
--  Limitations on container execution by location, valid signatures, user/group
-   cannot be enforced.
-
-Because of the points above, the default mode of operation of
-{Singularity} uses a setuid binary. Sylabs aims to reduce the
-circumstances that require this as new functionality is developed and
-reaches commonly deployed Linux distributions.
-
-********************************
- Runtime & User Privilege Model
-********************************
-
-While other runtimes have aimed to safely sandbox containers executing
-as the ``root`` user, so that they cannot affect the host system,
-{Singularity} has adopted an alternative security model:
-
--  Containers should be run as an unprivileged user.
-
--  The user should never be able to elevate their privileges inside the
-   container to gain control over the host.
-
--  All permission restrictions on the user outside of a container should
-   apply inside the container.
-
--  Favor integration over isolation. Allow a user to use host resources
-   such as GPUs, network file systems, high speed interconnects easily.
-   The process ID space, network etc. are not isolated in separate
-   namespaces by default.
-
-To accomplish this, {Singularity} uses a number of Linux kernel
-features. The container file system is mounted using the ``nosuid``
-option, and processes are started with the ``PR_NO_NEW_PRIVS`` flag set.
-This means that even if you run ``sudo`` inside your container, you
-won't be able to change to another user, or gain root privileges by
-other means.
-
-If you do require the additional isolation of the network, devices, PIDs
-etc. provided by other runtimes, {Singularity} can make use of
-additional namespaces and functionality such as seccomp and cgroups.
 
 ********************************
  Singularity Image Format (SIF)
@@ -212,9 +237,9 @@ encryption. The encrypted container is mounted directly through the
 kernel. Unlike other container formats, an encrypted container is not
 decrypted to disk in order to run it.
 
-*********************************
+*********
  Plugins
-*********************************
+*********
 
 As discussed in the {Singularity} User Guide, `plugins
 <https://sylabs.io/guides/{userversion}/user-guide/plugins.html>`_ provide a way

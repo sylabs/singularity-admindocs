@@ -25,17 +25,31 @@ other command. All standard input, output, errors, pipes, IPC, and other
 communication pathways used by locally running programs are synchronized
 with the applications running locally within the container.
 
-{Singularity} favors an 'integration over isolation' approach to
-containers. By default only the mount namespace is isolated for
-containers, so that they have their own filesystem view. Access to
-hardware such as GPUs, high speed networks, and shared filesystems is
-easy and does not require special configuration. Default access to
-user home directories, ``/tmp`` space, and installation specific
-mounts makes it simple for users to benefit from the reproducibility
-of containerized applications without major changes to their existing
-workflows. Where more complete isolation is important, {Singularity}
-can use additional Linux namespaces and other security and resource
-limits to accomplish this.
+Beginning with {Singularity} 4 there are two modes in which to run containers:
+
+- The default native mode uses a runtime that is unique to {Singularity}. This
+  is fully compatible with containers built for, and by, {Singularity} versions
+  2 and 3.
+
+- The optional OCI-mode uses a standard low-level OCI runtime to execute OCI
+  containers natively, for improved compatibility.
+
+{Singularity} favors an 'integration over isolation' approach to containers in
+native mode. By default only the mount namespace is isolated for containers, so
+that they have their own filesystem view. Default access to user home
+directories, ``/tmp`` space, and installation specific mounts makes it simple
+for users to benefit from the reproducibility of containerized applications
+without major changes to their existing workflows.
+
+In OCI-mode, more isolation is used by default so that behavior is similar to
+Docker and other OCI runtimes. However, networking is not virtualized and
+{Singularity}'s traditional behavior can be enabled with the ``--no-compat``
+option.
+
+In both modes, access to hardware such as GPUs, high speed networks, and shared
+filesystems is easy and does not require special configuration.  Where more
+complete isolation is important, {Singularity} can use additional Linux
+namespaces and other security and resource limits for that purpose.
 
 .. _singularity-security:
 
@@ -48,13 +62,41 @@ limits to accomplish this.
    See also the :ref:`security section <security>` of this guide, for more
    detail.
 
+When using the native runtime, a default installation of {Singularity} runs
+small amounts of privileged container setup code via a ``starter-setuid``
+binary. This is a 'setuid root' binary, used so that {Singularity} can perform
+mounts, create namespaces, and enter containers even on older systems that lack
+support for fully unprivileged container execution. The setuid flow is the
+default mode of operation, but :ref:`can be disabled <install-nonsetuid>` upon
+build, or in the ``singularity.conf`` configuration file if required.
+
+If setuid is disabled, or OCI-mode is used, {Singularity} sets up containers
+within an unprivileged user namespace. This makes use of features of newer
+kernels, as well as user space filesystem mounts (FUSE).
+
+.. note::
+
+   Running {Singularity} in non-setuid mode requires unprivileged user namespace
+   support in the operating system kernel and does not support all features.
+   This impacts integrity/security guarantees of containers at runtime.
+
+   See the :ref:`non-setuid installation section <install-nonsetuid>`
+   for further detail on how to install {Singularity} to run in
+   non-setuid mode.
+
+
 {Singularity} uses a number of strategies to provide safety and
 ease-of-use on both single-user and shared systems. Notable security
 features include:
 
-   -  The effective user inside a container is the same as the user who ran the
-      container. This means access to files and devices from the container is
-      easily controlled with standard POSIX permissions.
+   -  When using the default native runtime, with container setup via a setuid
+      helper program, the effective user inside a container is the same as the
+      user who ran the container. This means access to files and devices from
+      the container is easily controlled with standard POSIX permissions.
+
+   -  When using OCI-mode, or an unprivileged installation, subuid/subgid
+      mappings allows users access to other uids & gids in the container, which
+      map to safe administrator-defined ranges on the host.
 
    -  Container filesystems are mounted ``nosuid`` and container
       applications run with the prctl ``NO_NEW_PRIVS`` flag set. This means
@@ -74,25 +116,6 @@ features include:
    -  Restrictions can be configured to limit the ownership, location,
       and cryptographic signatures of containers that are permitted to
       be run.
-
-To support the SIF image format, automated networking setup etc., and
-older Linux distributions without user namespace support, Singularity
-runs small amounts of privileged container setup code via a
-``starter-setuid`` binary. This is a 'setuid root' binary, so that
-{Singularity} can perform filesystem loop mounts and other operations
-that need privilege. The setuid flow is the default mode of operation,
-but :ref:`can be disabled <install-nonsetuid>` on build, or in the
-``singularity.conf`` configuration file if required.
-
-.. note::
-
-   Running {Singularity} in non-setuid mode requires unprivileged user namespace
-   support in the operating system kernel and does not support all features.
-   This impacts integrity/security guarantees of containers at runtime.
-
-   See the :ref:`non-setuid installation section <install-nonsetuid>`
-   for further detail on how to install {Singularity} to run in
-   non-setuid mode.
 
 *******************
  OCI Compatibility
