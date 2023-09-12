@@ -44,7 +44,11 @@ Full functionality of {Singularity} requires that the kernel supports:
 
 -  **Unprivileged overlay** - (minimum kernel >=5.11, >=5.13 recommended)
    Required to use ``--overlay``, to mount a persistent overlay directory onto
-   the container, when running without root or setuid.
+   the container, when running without root or setuid in native mode. OCI-mode
+   will fall-back to the fuse-overlayfs userspace implementation.
+
+Note that the indicated kernel versions correspond to the mainline Linux kernel.
+Some Linux distributions may back-port features to older kernels.
 
 External Binaries
 -----------------
@@ -402,6 +406,54 @@ do not support user-namespace (sub)uid/gid mapping.
 
 - You should not run a sandbox container with ``--fakeroot`` from a
   Lustre, GPFS, or PanFS location.
+
+OCI-mode Limitations
+--------------------
+
+Because {Singularity} 4's new OCI-mode is unprivileged, and never uses a setuid
+starter executable for container configuration, it has requirements that may not
+be satisified by older Linux distributions. Certain features may be limited, as
+below.
+
+RHEL / Alma Linux / Rocky Linux / CentOS
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+On RHEL 9, all features of OCI-mode are supported. ``crun`` is the recommended
+low-level runtime, and is listed as a requirement by {Singularity} RPM packages.
+
+On RHEL 8, container resource limits cannot be applied as v1 cgroups are used by
+default. ``crun`` is the recommended low-level runtime, and is listed as a
+requirement by {Singularity} RPM packages.
+
+On RHEL 7, container resource limits cannot be applied as v1 cgroups are used by
+default. ``runc`` is the recommended low-level runtime, and is listed as a
+requirement by {Singularity} RPM packages. The ``--no-setgroups`` option, to
+preserve host supplementary group membership, is not supported by ``runc``.
+
+SLES / openSUSE Leap
+^^^^^^^^^^^^^^^^^^^^
+
+On SLES 15, container resource limits cannot be applied as v1 cgroups are used
+by default. ``runc`` is the recommended low-level runtime, and is listed as a
+requirement by {Singularity} RPM packages. The ``--no-setgroups`` option, to
+preserve host supplementary group membership, is not supported by ``runc``.
+
+OCI-mode is not supported on SLES12. The kernel does not support FUSE in
+unprivileged user namespaces nor does it support unprivileged kernel overlays.
+
+Ubuntu
+^^^^^^
+
+On Ubuntu 22.04 LTS, ``runc`` is the recommended low-level runtime, and is
+listed as a requirement by {Singularity} Deb packages. The ``--no-setgroups``
+option, to preserve host supplementary group membership, is not supported by
+``runc``.
+
+On Ubuntu 20.04 LTS, container resource limits cannot be applied as v1 cgroups
+are used by default. ``runc`` is the recommended low-level runtime, and is
+listed as a requirement by {Singularity} Deb packages. The ``--no-setgroups``
+option, to preserve host supplementary group membership, is not supported by
+``runc``.
 
 Install from Provided RPM / Deb Packages
 ========================================
