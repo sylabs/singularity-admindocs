@@ -23,7 +23,7 @@ run with full privilege.
 System Requirements
 ===================
 
-{Singularity} requires ~163MiB disk space once compiled and installed.
+{Singularity} requires ~180MiB disk space once compiled and installed.
 
 There are no specific CPU or memory requirements at runtime, though 2GB
 of RAM is recommended when building from source.
@@ -471,8 +471,6 @@ The packages are provided as a convenience for users of the open
 source project, and are built in our public CircleCI workflow. They are not
 signed, but SHA256 sums are provided on the release page.
 
-.. _install-dependencies:
-
 Install from Source
 ===================
 
@@ -485,48 +483,108 @@ If you have an earlier version of {Singularity} installed, you should
 installation commands. You will also need to install some dependencies
 and install `Go <https://golang.org/>`_.
 
+.. _install-dependencies:
+
 Install Dependencies
 --------------------
 
-On Red Hat Enterprise Linux or CentOS install the following
-dependencies:
+On Debian-based systems, including Ubuntu:
 
-.. code:: sh
-
-   # Install basic tools for compiling
-   sudo yum groupinstall -y 'Development Tools'
-   # Install RPM packages for dependencies
-   sudo yum install -y \
-      libseccomp-devel \
-      glib2-devel \
-      squashfs-tools \
-      cryptsetup \
-      runc
-
-On Ubuntu or Debian install the following dependencies:
-
-.. code:: sh
+.. code::
 
    # Ensure repositories are up-to-date
    sudo apt-get update
    # Install debian packages for dependencies
    sudo apt-get install -y \
-      build-essential \
-      libseccomp-dev \
-      libglib2.0-dev \
-      pkg-config \
-      squashfs-tools \
+      autoconf \
+      automake \
       cryptsetup \
-      runc
+      git \
+      libfuse-dev \
+      libglib2.0-dev \
+      libseccomp-dev \
+      libtool \
+      pkg-config \
+      runc \
+      squashfs-tools \
+      squashfs-tools-ng \
+      uidmap \
+      wget \
+      zlib1g-dev
+
+On versions 8 or later of RHEL / Alma Linux / Rocky Linux, as well as on Fedora:
+
+.. code::
+
+   # Install basic tools for compiling
+   sudo yum groupinstall -y 'Development Tools'
+   # Install RPM packages for dependencies
+   sudo yum install -y \
+      autoconf \
+      automake \
+      crun \
+      cryptsetup \
+      fuse3-devel \
+      git \
+      glib2-devel \
+      libseccomp-devel \
+      libtool \
+      squashfs-tools \
+      wget \
+      zlib-devel
+
+On version 7 of RHEL / CentOS:
+
+.. code::
+
+   # Install basic tools for compiling
+   sudo yum groupinstall -y 'Development Tools'
+   # Install RPM packages for dependencies
+   sudo yum install -y \
+      autoconf \
+      automake \
+      cryptsetup \
+      fuse3-devel \
+      git \
+      glib2-devel \
+      libseccomp-devel \
+      libtool \
+      runc \
+      squashfs-tools \
+      wget \
+      zlib-devel
+
+On SLES / openSUSE Leap:
+
+.. code::
+
+   # Install RPM packages for dependencies
+   sudo zypper in \
+    autoconf \
+    automake \
+    cryptsetup \
+    fuse3-devel \
+    gcc \
+    gcc-c++ \
+    git \
+    glib2-devel \
+    libseccomp-devel \
+    libtool \
+    make \
+    pkg-config \
+    runc \
+    squashfs \
+    wget \
+    zlib-devel
 
 .. note::
 
    You can build {Singularity} without ``cryptsetup`` available,
-   but will not be able to use encrypted containers without it installed
+   but you will not be able to use encrypted containers without it installed
    on your system.
 
-   If you will not use the ``singularity oci`` commands, ``runc`` is not
-   required.
+   If you will not use the ``singularity oci`` commands, or OCI-mode, ``crun`` /
+   ``runc`` is not required.
 
 .. _install-go:
 
@@ -745,10 +803,9 @@ continues to work in new shells. (Adjust the path if you installed
 Build and install an RPM
 ========================
 
-If you use RHEL, CentOS or SUSE, building and installing a Singularity
-RPM allows your {Singularity} installation be more easily managed,
-upgraded and removed. In {Singularity} >=v3.0.1 you can build an RPM
-directly from the `release tarball
+If you use RHEL, CentOS or SUSE, building and installing a Singularity RPM
+allows your {Singularity} installation to be more easily managed, upgraded and
+removed. You can build an RPM directly from the `release tarball
 <https://github.com/sylabs/singularity/releases>`_.
 
 .. note::
@@ -820,10 +877,10 @@ dist`` to create a tarball that you can then build into an rpm with
 Remove an old version
 =====================
 
-In a standard installation of {Singularity} 3.0.1 and beyond (when
-building from source), the command ``sudo make install`` lists all the
-files as they are installed. You must remove all of these files and
-directories to completely remove {Singularity}.
+In a standard installation of {Singularity} (when building from source), the
+command ``sudo make -C builddir install`` lists all the files as they are
+installed. You must remove all of these files and directories to completely
+remove {Singularity}.
 
 .. code::
 
@@ -870,9 +927,9 @@ at runtime.
 .. code::
 
    $ singularity buildcfg
-   PACKAGE_NAME=singularity
+   PACKAGE_NAME=singularity-ce
    PACKAGE_VERSION={InstallationVersion}
-   BUILDDIR=/home/dtrudg/Sylabs/Git/singularity/builddir
+   BUILDDIR=/home/myuser/singularity/builddir
    PREFIX=/usr/local
    EXECPREFIX=/usr/local
    BINDIR=/usr/local/bin
@@ -885,13 +942,16 @@ at runtime.
    LOCALSTATEDIR=/usr/local/var
    RUNSTATEDIR=/usr/local/var/run
    INCLUDEDIR=/usr/local/include
-   DOCDIR=/usr/local/share/doc/singularity
+   DOCDIR=/usr/local/share/doc/singularity-ce
    INFODIR=/usr/local/share/info
    LIBDIR=/usr/local/lib
    LOCALEDIR=/usr/local/share/locale
    MANDIR=/usr/local/share/man
    SINGULARITY_CONFDIR=/usr/local/etc/singularity
    SESSIONDIR=/usr/local/var/singularity/mnt/session
+   PLUGIN_ROOTDIR=/usr/local/libexec/singularity/plugin
+   SINGULARITY_CONF_FILE=/usr/local/etc/singularity/singularity.conf
+   SINGULARITY_SUID_INSTALL=1
 
 Note that the ``LOCALSTATEDIR`` and ``SESSIONDIR`` should be on local,
 non-shared storage.
@@ -911,9 +971,7 @@ targets from the ``builddir`` directory in the source tree:
 
 -  ``make check`` runs source code linting and dependency checks
 
--  ``make unit-test`` runs basic unit tests
-
--  ``make integration-test`` runs integration tests
+-  ``make test`` runs basic unit and integration tests
 
 -  ``make e2e-test`` runs end-to-end tests, which exercise a large
    number of operations by calling the {Singularity} CLI with different
