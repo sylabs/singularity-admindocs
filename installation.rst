@@ -264,11 +264,26 @@ Overlay support
 ^^^^^^^^^^^^^^^
 
 Various features of {Singularity}, such as the ``--writable-tmpfs`` and
-``--overlay``, options use the Linux ``overlay`` filesystem driver to
-construct a container root filesystem that combines files from different
-locations. Not all filesystems can be used with the ``overlay`` driver,
-so when containers are run from these filesystems some {Singularity}
-features may not be available.
+``--overlay`` options, use overlay mounts to construct a container root
+filesystem that combines files from different locations. Overlay mounts may use
+the Linux kernel overlay filesystem driver or the fuse-overlayfs userspace
+implementation, depending on the workflow and support from the host kernel.
+
+Overlays are mounted with the Linux kernel driver when:
+
+- The native runtime is used in setuid mode.
+- The native runtime is used in unprivileged / non-setuid mode, and
+  the kernel supports unprivileged overlay mounts.
+- OCI-mode is used without an extfs overlay image, and the kernel supports
+  unprivileged overlay mounts.
+
+Overlays are mounted with the fuse-overlayfs userspace implementation when:
+
+- OCI-mode is used, and the kernel does not support unprivileged overlay mounts.
+- OCI-mode is used, with an extfs overlay image.
+
+Not all filesystems can be used with the overlay driver, so when containers
+are run from these filesystems some {Singularity} features may not be available.
 
 Overlay support has two aspects:
 
