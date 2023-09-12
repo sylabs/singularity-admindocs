@@ -139,6 +139,57 @@ currently implemented, but OCI containers using the ``USER`` directive or which
 are otherwise incompatible with {Singularity}'s native runtime are better
 supported. Note that OCI-mode has additional :ref:`system requirements <system-requirements>`.
 
+***********************
+ Version Compatibility
+***********************
+
+Up to and including version 4, the major version number of {Singularity} was
+increased only when a significant change or addition was made to the container
+format:
+
+- v1 packaged applications in a different manner than later versions, and was
+  not widely deployed.
+- v2 used extfs or squashfs bare image files for the container root filesystem.
+- v3 introduced and switched to the Singularity Image Format (SIF).
+- v4 added OCI-SIF images, a variant of SIF encapsulating OCI containers
+  directly. These are used by the new OCI-mode.
+
+Minor versions, e.g. within the 3.x series, frequently introduced changes to
+existing behavior not related to the basic container format.
+
+Beginning with version 4, {Singularity} aims to follow `semantic versioning
+<https://semver.org/>`__ where breaking changes to the CLI or runtime behavior
+will also be limited to a new major version. New features that do not modify
+existing behavior may be introduced in minor version updates.
+
+Backward Compatibility
+======================
+
+Execution of container images from 2 prior major versions is supported.
+{Singularity} 4 can run container images created with versions 2 and 3. Except
+where documented in the project changelog, differences in behaviour when
+running v2 or v3 containers using the native runtime in setuid mode are
+considered bugs.
+
+{Singularity} 4's OCI-mode cannot perfectly emulate the behavior of the native
+runtime in setuid mode. Although most workflows are supported, complex
+containers created with {Singularity} 2 or 3 may not run as expected in OCI-mode.
+
+Forward Compatibility
+=====================
+
+{Singularity} 4 will build SIF container images that can be run with version 3.
+The scope of this forward compatibility depends on the features used when
+creating the container, and the 3.x minor version used to run the container:
+
+- The OCI-SIF format (OCI-mode) is not supported before v4.
+- The SIF DSSE signature format (key / certificate based signing) was introduced
+  at v3.11.0.
+- The SIF PGP signature format was changed at v3.6.0, therefore older versions
+  cannot verify newer signatures.
+- Container / host environment handling was modified at v3.6.0.
+- LUKS2 encrypted containers are not supported prior to v3.4.0
+
 **************************
  Installation from Source
 **************************
