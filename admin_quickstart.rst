@@ -164,46 +164,107 @@ below. Other methods are discussed in the :ref:`Installation
 Install Dependencies
 ====================
 
-On Red Hat Enterprise Linux or CentOS install the following
-dependencies:
+On Debian-based systems, including Ubuntu:
 
-.. code:: sh
-
-   # Install basic tools for compiling
-   sudo yum groupinstall -y 'Development Tools'
-   # Install RPM packages for dependencies
-   sudo yum install -y \
-      wget \
-      libseccomp-devel \
-      glib2-devel \
-      squashfs-tools \
-      cryptsetup \
-      runc
-
-On Ubuntu or Debian install the following dependencies:
-
-.. code:: sh
+.. code::
 
    # Ensure repositories are up-to-date
    sudo apt-get update
    # Install debian packages for dependencies
    sudo apt-get install -y \
-      wget \
-      build-essential \
-      libseccomp-dev \
-      libglib2.0-dev \
-      pkg-config \
-      squashfs-tools \
+      autoconf \
+      automake \
       cryptsetup \
-      runc
+      git \
+      libfuse-dev \
+      libglib2.0-dev \
+      libseccomp-dev \
+      libtool \
+      pkg-config \
+      runc \
+      squashfs-tools \
+      squashfs-tools-ng \
+      uidmap \
+      wget \
+      zlib1g-dev
 
-_Note - `runc` can be ommitted if you will not use the `singularity oci`
-commands._
+On versions 8 or later of RHEL / Alma Linux / Rocky Linux, as well as on Fedora:
+
+.. code::
+
+   # Install basic tools for compiling
+   sudo yum groupinstall -y 'Development Tools'
+   # Install RPM packages for dependencies
+   sudo yum install -y \
+      autoconf \
+      automake \
+      crun \
+      cryptsetup \
+      fuse3-devel \
+      git \
+      glib2-devel \
+      libseccomp-devel \
+      libtool \
+      squashfs-tools \
+      wget \
+      zlib-devel
+
+On version 7 of RHEL / CentOS:
+
+.. code::
+
+   # Install basic tools for compiling
+   sudo yum groupinstall -y 'Development Tools'
+   # Install RPM packages for dependencies
+   sudo yum install -y \
+      autoconf \
+      automake \
+      cryptsetup \
+      fuse3-devel \
+      git \
+      glib2-devel \
+      libseccomp-devel \
+      libtool \
+      runc \
+      squashfs-tools \
+      wget \
+      zlib-devel
+
+On SLES / openSUSE Leap:
+
+.. code::
+
+   # Install RPM packages for dependencies
+   sudo zypper in \
+    autoconf \
+    automake \
+    cryptsetup \
+    fuse3-devel \
+    gcc \
+    gcc-c++ \
+    git \
+    glib2-devel \
+    libseccomp-devel \
+    libtool \
+    make \
+    pkg-config \
+    runc \
+    squashfs \
+    wget \
+    zlib-devel
+
+.. note::
+
+   You can build {Singularity} without ``cryptsetup`` available, but you will
+   not be able to use encrypted containers without it installed on your system.
+
+   If you will not use the ``singularity oci`` commands, or OCI-mode, ``crun`` /
+   ``runc`` is not required.
 
 Install Go
 ==========
 
-{Singularity} v3 is written primarily in Go, and you will need Go installed to
+{Singularity} is written in Go, and you will need Go installed to
 compile it from source. Versions of Go packaged by your distribution may not be
 new enough to build {Singularity}.
 
