@@ -1271,15 +1271,18 @@ For more details on the ``remote`` command group and managing remote
 endpoints, please check the `Remote Userdocs
 <https://www.sylabs.io/guides/{userversion}/user-guide/endpoint.html>`_.
 
+.. _keyserver:
+
 Keyserver Configuration
 =======================
 
-By default, {Singularity} will use the keyserver correlated to the
-active cloud service endpoint. This behavior can be changed or
-supplemented via the ``add-keyserver`` and ``remove-keyserver``
-commands. These commands allow an administrator to create a global list
-of key servers used to verify container signatures by default.
+By default, {Singularity} will use the keyserver correlated to the active cloud
+service endpoint. This behavior can be changed or supplemented via the
+``keyserver add`` and ``keyserver remove`` commands. These commands allow an
+administrator to create a global list of key servers used to verify container
+signatures by default.
 
-For more details on the ``remote`` command group and managing
-keyservers, please check the `Remote Userdocs
-<https://www.sylabs.io/guides/{userversion}/user-guide/endpoint.html>`_.
+For more details on the ``keyserver`` command group and managing keyservers,
+please see the `Keyserver Management section
+<https://www.sylabs.io/guides/{userversion}/user-guide/keyserver.html>`_ of the
+user guide.
