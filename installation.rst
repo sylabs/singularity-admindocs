@@ -157,6 +157,8 @@ distributions using their native tooling:
 -  ``uname``, ``zypper``, ``SUSEConnect`` for SLES derived RPM based
    distributions.
 
+.. _sqfstar:
+
 Installing sqfstar / tar2sqfs for OCI-mode
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
