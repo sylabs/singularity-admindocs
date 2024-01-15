@@ -178,7 +178,7 @@ containers created with {Singularity} 2 or 3 may not run as expected in OCI-mode
 Forward Compatibility
 =====================
 
-{Singularity} 4 will build SIF container images that can be run with version 3.
+{Singularity} 4 can build SIF container images that can be run with version 3.
 The scope of this forward compatibility depends on the features used when
 creating the container, and the 3.x minor version used to run the container:
 
@@ -189,6 +189,11 @@ creating the container, and the 3.x minor version used to run the container:
   cannot verify newer signatures.
 - Container / host environment handling was modified at v3.6.0.
 - LUKS2 encrypted containers are not supported prior to v3.4.0
+
+{Singularity} 4.1 will build container images that can be run with version 4.0,
+with the exception of multi-layer OCI-SIF images. A multi-layer OCI-SIF created
+with the 4.1 ``--keep-layers`` option must be executed using version 4.1 or
+later. 
 
 **************************
  Installation from Source
