@@ -39,8 +39,8 @@ Full functionality of {Singularity} requires that the kernel supports:
    build containers unprivileged in ``--fakeroot`` mode. Required to run
    containers in OCI-mode (``-oci``).
 
-- **FUSE in unprivileged user namespaces** - (minimum kernel >=4.18) Required to
-  run containers in OCI-Mode (``-oci``).
+-  **FUSE in unprivileged user namespaces** - (minimum kernel >=4.18) Required
+   to run containers in OCI-Mode (``-oci``).
 
 -  **Unprivileged overlay** - (minimum kernel >=5.11, >=5.13 recommended)
    Required to use ``--overlay``, to mount a persistent overlay directory onto
@@ -65,7 +65,8 @@ compilation time ``mconfig`` options can be used to disable building these
 tools, in which case they will be searched for on ``$PATH`` at runtime.
 
 - ``squashfuse`` or ``squashfuse_ll`` are used to mount squashfs filesystems
-  from OCI-SIF images in OCI-mode.
+  from OCI-SIF images in OCI-mode. They may be used to mount squashfs
+  filesystems from SIF images and bare squashfs containers in non-OCI mode.
 
 - ``conmon`` is used to manage monitoring and attaching to non-interactive
   containers started with the ``singularity oci start`` command.
@@ -136,9 +137,11 @@ runtime:
 - ``sqfstar`` or ``tar2sqfs`` are used in the creation of OCI-SIF images from
   OCI sources, in OCI-mode (``--oci``).
 
-- ``fuse-overlayfs`` is used in OCI-mode to setup overlay filesystems when the
-  kernel does not support unprivileged overlay or the required overlay
-  configuration.
+- ``fuse2fs`` is used to mount extfs images in unprivileged flows, or when
+  kernel extfs mount is disabled by configuration.
+
+- ``fuse-overlayfs`` is used to setup overlay filesystems when the kernel does
+  not support unprivileged overlay or the required overlay configuration.
 
 - ``fusermount3`` or ``fusermount`` is used to unmount FUSE filesystems safely,
   in OCI-mode and other flows.
@@ -162,62 +165,46 @@ distributions using their native tooling:
 Installing sqfstar / tar2sqfs for OCI-mode
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you intend to use the  `OCI mode
-<https://sylabs.io/guides/{userversion}/user-guide/oci_runtime.html>`_ of
-{Singularity}, your system must provide either:
+If you intend to use the ``--oci`` execution mode of SingularityCE, your system
+must provide either:
 
-* ``squashfs-tools`` / ``squashfs`` >= 4.5, which provides the ``sqfstar``
-  utility. Note that older versions of these packages, provided by many
-  distributions, do not include ``sqfstar``.
-* ``squashfs-tools-ng``, which provides the ``tar2sqfs`` utility. This is not
+- ``squashfs-tools / squashfs`` >= 4.5, which provides the ``sqfstar`` utility.
+  Older versions packaged by many distributions do not include ``sqfstar``.
+- ``squashfs-tools-ng``, which provides the ``tar2sqfs`` utility. This is not
   packaged by all distributions.
-
-Below are instructions on how to obtain one of these two utilities on various
-distributions.
 
 Debian / Ubuntu
 """""""""""""""
 
-On Debian/Ubuntu, ``squashfs-tools-ng`` is available in the distribution
-repositories. No further action is necessary.
-
-Fedora
-""""""
-
-On Fedora, the ``squashfs-tools`` package, available in the repositories,
-includes `sqfstar`. No further action is necessary.
+On Debian/Ubuntu ``squashfs-tools-ng`` is available in the distribution
+repositories. It has been included in the "Install system dependencies" step
+above. No further action is necessary.
 
 RHEL / Alma Linux / Rocky Linux / CentOS
 """"""""""""""""""""""""""""""""""""""""
 
-On RHEL and derivatives, a COPR is available at:
-https://copr.fedorainfracloud.org/coprs/dctrud/squashfs-tools-ng/
+On RHEL and derivatives, the ``squashfs-tools-ng`` package is now
+available in the EPEL repositories.
 
-This COPR provides ``squashfs-tools-ng``, which will not replace any standard EL
-or EPEL packages. To use it:
-
-**EL 8 / 9:**
-
-.. code::
-
-  sudo dnf install dnf-plugins-core
-  sudo dnf copr enable dctrud/squashfs-tools-ng
-  sudo dnf install squashfs-tools-ng
-
-**EL 7:**
+Follow the `EPEL Quickstart <https://docs.fedoraproject.org/en-US/epel/#_quickstart>`__
+for you distribution to enable the EPEL repository. Install ``squashfs-tools-ng`` with
+``dnf`` or ``yum``.
 
 .. code::
 
-  sudo yum install yum-plugin-copr
-  sudo yum copr enable dctrud/squashfs-tools-ng
-  sudo yum install squashfs-tools-ng
+   # EL 8 / 9
+   sudo dnf install squashfs-tools-ng
+
+   # EL 7
+   sudo yum install squashfs-tools-ng
+
 
 SLES / openSUSE Leap
 """"""""""""""""""""
 
 On SLES/openSUSE, follow the instructions at the `filesystems
-project <https://software.opensuse.org//download.html?project=filesystems&package=squashfs>`_
-to obtain a more recent ``squashfs`` package, which provides ``sqfstar``.
+project <https://software.opensuse.org//download.html?project=filesystems&package=squashfs>`__
+to obtain an more recent `squashfs` package that provides ``sqfstar``.
 
 Non-standard ldconfig / Nix & Guix Environments
 -----------------------------------------------
@@ -501,6 +488,8 @@ On Debian-based systems, including Ubuntu:
       autoconf \
       automake \
       cryptsetup \
+      fuse \
+      fuse2fs \
       git \
       libfuse-dev \
       libglib2.0-dev \
@@ -526,6 +515,8 @@ On versions 8 or later of RHEL / Alma Linux / Rocky Linux, as well as on Fedora:
       automake \
       crun \
       cryptsetup \
+      fuse \
+      fuse3 \
       fuse3-devel \
       git \
       glib2-devel \
@@ -546,6 +537,8 @@ On version 7 of RHEL / CentOS:
       autoconf \
       automake \
       cryptsetup \
+      fuse \
+      fuse3 \
       fuse3-devel \
       git \
       glib2-devel \
@@ -562,22 +555,24 @@ On SLES / openSUSE Leap:
 
    # Install RPM packages for dependencies
    sudo zypper in \
-    autoconf \
-    automake \
-    cryptsetup \
-    fuse3-devel \
-    gcc \
-    gcc-c++ \
-    git \
-    glib2-devel \
-    libseccomp-devel \
-    libtool \
-    make \
-    pkg-config \
-    runc \
-    squashfs \
-    wget \
-    zlib-devel
+      autoconf \
+      automake \
+      cryptsetup \
+      fuse2fs \
+      fuse3 \
+      fuse3-devel \
+      gcc \
+      gcc-c++ \
+      git \
+      glib2-devel \
+      libseccomp-devel \
+      libtool \
+      make \
+      pkg-config \
+      runc \
+      squashfs \
+      wget \
+      zlib-devel
 
 .. note::
 

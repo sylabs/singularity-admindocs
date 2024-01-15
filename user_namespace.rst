@@ -79,10 +79,13 @@ use a user namespace. In this mode of operation, some features are not
 available, and there are impacts to the security/integrity guarantees
 when running SIF container images:
 
--  Unless using the experimental ``--sif-fuse`` function, all containers must be
-   run from sandbox directories. SIF images are extracted to a sandbox directory
-   on the fly, preventing verification at runtime, and potentially allowing
-   external modification of the container at runtime.
+-  SIF and other single file container images will be mounted using FUSE,
+   falling back to extraction to a directory if a FUSE mount is not possible.
+
+-  The effectiveness of signing and verifying container images is reduced as,
+   when mounted by a user controlled FUSE binary or extracted to a directory,
+   modification is possible and verification of the image's original signature
+   cannot be performed at runtime.
 
 -  Filesystem image, and SIF-embedded persistent overlays cannot be
    used. Directory overlays require kernel >=5.11.
@@ -105,39 +108,6 @@ workflow for container setup even if {Singularity} was compiled and
 configured to use setuid by default.
 
 The same limitations apply as in an unprivileged installation.
-
-*******************
- --sif-fuse option
-*******************
-
-If ``squashfuse`` >=0.1.100 is installed on the system, and available on the
-``$PATH``, {Singularity} can use it to mount a container filesystem from a SIF
-file in unprivileged / user namespace flows.
-
-This is an experimental feature, and does not currently apply to ``--fakeroot``,
-or support additional overlays etc.
-
-To always attempt a ``squashfuse`` based mount, set ``sif fuse = yes`` in
-``singularity.conf``. Otherwise, use the ``--sif-fuse`` flag. E.g.:
-
-.. code::
-
-   $ singularity run -u --sif-fuse  ~/ubuntu_latest.sif 
-   INFO:    Mounting SIF with FUSE...
-   Singularity> 
-   exit
-   INFO:    Unmounting SIF with FUSE...
-   INFO:    Removing image tempDir /tmp/rootfs-33363059
-
-{Singularity} will call ``squashfuse`` before container startup, to mount the
-container filesystem read-only, from the SIF to a temporary location. When the
-container exits, ``fusermount`` is used to unmount the SIF filesystem, and the
-temporary location is cleaned up.
-
-If a ``squashfuse`` mount cannot be performed successfully, {Singularity} will
-fall back to extracting the SIF image to a temporary directory, with a warning
-as this extraction is performed.
-
 
 .. _fakeroot:
 

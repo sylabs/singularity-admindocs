@@ -308,38 +308,56 @@ types of image formats that can be leveraged by users with
    containers with an encrypted root filesystem.
 -  ``allow container squashfs`` permits / denies execution of bare
    SquashFS image files. E.g. Singularity 2.x images.
--  ``allow container extfs`` permits / denies execution of bare EXT
+-  ``allow container extfs`` permits / denies execution of bare extfs
    image files.
--  ``allow container dir`` permits / denies execution of sandbox
-   directory containers.
+-  ``allow container dir`` permits / denies execution of sandbox directory
+   containers. Also applies to SIF / squashfs / extfs images when mounted to a
+   directory by FUSE binaries run as the user, or automatically extracted to a
+   directory.
 
 .. note::
 
    These limitations do not apply to the root user.
 
-   This behavior differs from {Singularity} versions before 3.9, where
-   the ``allow container squashfs/extfs`` directives also applied to the
-   filesystem embedded in a SIF image.
+.. note::
+
+   When a SIF / squashfs / extfs container image is mounted using FUSE, or
+   extracted to disk, the ``allow container dir`` setting applies. In contrast
+   to kernel mounts, FUSE mounted container images are mounted at a directory
+   under the full control of the user, who may also manipulate the behavior of
+   the FUSE binary.
+
+.. _sec:kernelmounts:
 
 Disabling Kernel Filesystem Mounts
 ==================================
 
 When running in setuid mode, {Singularity} will mount extfs and squashfs
 filesystems using the kernel's filesystem drivers. These mounts are performed
-for standalone or SIF container images, overlay images or partitions,
-that use extfs or squashfs formats.
+for standalone or SIF container images, overlay images or partitions, that use
+extfs or squashfs formats.
 
 Options in ``singularity.conf`` allow these mounts to be disabled, to e.g. work
-around a kernel vulnerability that cannot be patched in a timely manner. Note
-that disabling kernel mounts will result in a significant loss of functionality
-in setuid mode.
+around a kernel vulnerability that cannot be patched in a timely manner.
+Singularity will then attempt to use ``squashfuse`` or ``fuse2fs`` to mount
+container images in user space. If it is not possible to perform a FUSE mount, a
+container image will be extracted to a sandbox directory for execution.
+
+Note that disabling kernel mounts will result in a significant loss of
+functionality in setuid mode. Container execution restrictions cannot be
+effectively applied, and not all overlay configurations are supported.
 
 ``allow kernel squashfs``: Defaults to yes. When set to no, {Singularity} will
-not mount squashfs filesystems using the kernel squashfs driver.
+not mount squashfs filesystems using the kernel squashfs driver. If possible,
+``squashfuse_ll`` will be used to mount a squashfs container image in user
+space. If ``squashfuse_ll`` is not available, or fails, the image will be
+extracted to a directory for execution.
 
 ``allow kernel extfs``: Defaults to yes. When set to no, {Singularity} will not
-mount extfs filesystems using the kernel extfs driver.
-
+mount extfs filesystems using the kernel extfs driver. If possible, ``fuse2fs``
+will be used to mount an extfs container image in user space. If ``fuse2fs`` is
+not available, or fails, the image will be extracted to a directory for
+execution.
 
 Networking Options
 ==================
@@ -500,7 +518,7 @@ Disabling temporary sandbox dirs
 
 Some execution flows will extract the contents of an image into a temporary
 local sandbox dir prior to execution. Examples include: using a user namespace
-in native mode (by specifying ``--userns``), as well as using OCI-mode in an
+in native mode when FUSE is not available, as well as using OCI-mode in an
 environment that does not support OCI-SIF (see the discussion of OCI-mode
 :ref:`above <sec:ocimode>`).
 
@@ -511,13 +529,16 @@ extracting the contents of images to temporary sandbox dirs, may do so by adding
 ``tmp sandbox``: Allow extraction of image contents to temporary sandbox dir.
 (default: ``yes``)
 
-Experimental Options
-====================
+Deprecated Experimental Options
+===============================
 
 ``sif fuse``: If set to ``yes``, always attempt to mount a SIF image using
-``squashfuse`` when running in unprivileged / user namespace flows. Requires
-``squashfuse`` and ``fusermount`` on ``$PATH``. Will fall back to extracting
-the SIF file on failure.
+``squashfuse`` when running in unprivileged / user namespace flows. This is
+equivalent to always specifying the experimental `--sif-fuse` flag. **Deprecated
+in {Singularity} 4.1**, as a FUSE mount will be attempted by default in these
+circumstances. The option has no effect in 4.1, and is retained only for
+configuration file compatibility with prior versions.
+
 
 Updating Configuration Options
 ==============================

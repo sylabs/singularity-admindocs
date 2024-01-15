@@ -226,6 +226,8 @@ On Debian-based systems, including Ubuntu:
       autoconf \
       automake \
       cryptsetup \
+      fuse \
+      fuse2fs \
       git \
       libfuse-dev \
       libglib2.0-dev \
@@ -251,6 +253,8 @@ On versions 8 or later of RHEL / Alma Linux / Rocky Linux, as well as on Fedora:
       automake \
       crun \
       cryptsetup \
+      fuse \
+      fuse3 \
       fuse3-devel \
       git \
       glib2-devel \
@@ -271,6 +275,8 @@ On version 7 of RHEL / CentOS:
       autoconf \
       automake \
       cryptsetup \
+      fuse \
+      fuse3 \
       fuse3-devel \
       git \
       glib2-devel \
@@ -281,28 +287,30 @@ On version 7 of RHEL / CentOS:
       wget \
       zlib-devel
 
-On SLES / openSUSE Leap:
+On SLES / openSUSE Leap 15:
 
 .. code::
 
    # Install RPM packages for dependencies
    sudo zypper in \
-    autoconf \
-    automake \
-    cryptsetup \
-    fuse3-devel \
-    gcc \
-    gcc-c++ \
-    git \
-    glib2-devel \
-    libseccomp-devel \
-    libtool \
-    make \
-    pkg-config \
-    runc \
-    squashfs \
-    wget \
-    zlib-devel
+      autoconf \
+      automake \
+      cryptsetup \
+      fuse2fs \
+      fuse3 \
+      fuse3-devel \
+      gcc \
+      gcc-c++ \
+      git \
+      glib2-devel \
+      libseccomp-devel \
+      libtool \
+      make \
+      pkg-config \
+      runc \
+      squashfs \
+      wget \
+      zlib-devel
 
 .. note::
 
@@ -311,6 +319,51 @@ On SLES / openSUSE Leap:
 
    If you will not use the ``singularity oci`` commands, or OCI-mode, ``crun`` /
    ``runc`` is not required.
+
+Install sqfstar / tar2sqfs for OCI-mode
+=======================================
+
+If you intend to use the ``--oci`` execution mode of SingularityCE, your system
+must provide either:
+
+- ``squashfs-tools / squashfs`` >= 4.5, which provides the ``sqfstar`` utility.
+  Older versions packaged by many distributions do not include ``sqfstar``.
+- ``squashfs-tools-ng``, which provides the ``tar2sqfs`` utility. This is not
+  packaged by all distributions.
+
+Debian / Ubuntu
+---------------
+
+On Debian/Ubuntu ``squashfs-tools-ng`` is available in the distribution
+repositories. It has been included in the "Install system dependencies" step
+above. No further action is necessary.
+
+RHEL / Alma Linux / Rocky Linux / CentOS
+----------------------------------------
+
+On RHEL and derivatives, the ``squashfs-tools-ng`` package is now
+available in the EPEL repositories.
+
+Follow the `EPEL Quickstart <https://docs.fedoraproject.org/en-US/epel/#_quickstart>`__
+for you distribution to enable the EPEL repository. Install ``squashfs-tools-ng`` with
+``dnf`` or ``yum``.
+
+.. code::
+
+   # EL 8 / 9
+   sudo dnf install squashfs-tools-ng
+
+   # EL 7
+   sudo yum install squashfs-tools-ng
+
+
+SLES / openSUSE Leap
+--------------------
+
+On SLES/openSUSE, follow the instructions at the `filesystems
+project <https://software.opensuse.org//download.html?project=filesystems&package=squashfs>`__
+to obtain an more recent `squashfs` package that provides ``sqfstar``.
+
 
 Install Go
 ==========

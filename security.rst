@@ -101,6 +101,11 @@ If you do require the additional isolation of the network, devices, PIDs
 etc. provided by other runtimes, {Singularity} can make use of
 additional namespaces and functionality such as seccomp and cgroups.
 
+If you are concerned about potential security impacts of performing kernel
+filesystem mounts, or are unable to patch kernel filesystem vulnerabilities in a
+timely manner, you may wish to :ref:`disable them via singularity.conf
+<sec:kernelmounts>`.
+
 Unprivileged / User Namespace Mode
 ==================================
 
@@ -111,20 +116,21 @@ containers via a user namespace. With this configuration, all container setup
 operations run as the user who starts the ``singularity`` program. However,
 there are some disadvantages:
 
--  SIF and other single file container images cannot be mounted directly, except
-   via the experimental ``--sif-fuse`` feature. The container image must be
-   extracted to a directory on disk to run. This impacts the speed of execution.
-   Workloads accessing large numbers of small files (such as python application
-   startup) do not benefit from the reduced metadata load on the filesystem that
-   using an image file normally provides.
+-  SIF and other single file container images will be mounted using FUSE,
+   falling back to extraction to a directory if a FUSE mount is not possible.
 
--  Replacing direct kernel mounts with the experimental ``--sif-fuse`` FUSE
-   mount approach can cause a significant reduction in performance.
+-  FUSE mounts may result in a small performance penalty.
 
--  The effectiveness of signing and verifying container images is
-   reduced as, when extracted to a directory, modification is possible
-   and verification of the image's original signature cannot be
-   performed.
+-  Running containers from a directory can dramatically impact the speed of
+   execution for workloads accessing large numbers of small files (such as
+   python application startup). This is because containers extracted to a
+   directory do not benefit from the reduced metadata load on the filesystem
+   that using an image file normally provides.
+
+-  The effectiveness of signing and verifying container images is reduced as,
+   when mounted by a user controlled FUSE binary or extracted to a directory,
+   modification is possible and verification of the image's original signature
+   cannot be performed.
 
 -  Encryption is not supported. {Singularity} leverages kernel LUKS2
    mounts to run encrypted containers without decrypting their content
@@ -136,7 +142,9 @@ there are some disadvantages:
    reluctant to enable unprivileged user namespace creation.
 
 -  Limitations on container execution by location, valid signatures, user/group
-   cannot be enforced.
+   cannot be effectively enforced. A user who can create a user namespace
+   unprivileged would be able to trivially bypass any restrictions set for the
+   system's {Singularity} installation.
 
 Because of the points above, the default mode of operation of
 {Singularity} uses a setuid binary. Sylabs aims to reduce the
