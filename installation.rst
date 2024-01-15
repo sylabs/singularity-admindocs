@@ -399,10 +399,15 @@ do not support user-namespace (sub)uid/gid mapping.
 OCI-mode Limitations
 --------------------
 
-Because {Singularity} 4's new OCI-mode is unprivileged, and never uses a setuid
+Because {Singularity} 4's OCI-mode is unprivileged, and never uses a setuid
 starter executable for container configuration, it has requirements that may not
-be satisified by older Linux distributions. Certain features may be limited, as
-below.
+be satisified by older Linux distributions.
+
+OCI-mode, including Dockerfile builds to OCI-SIF, will generally operate
+correctly on Linux distributions that use kernel 4.18 or later and v2 cgroups.
+Some distributions that use earlier kernels may have backported functionality
+that allows OCI-Mode to be used, but certain features may be limited as below.
+Distributions using v1 cgroups also have limitations, discussed below.
 
 RHEL / Alma Linux / Rocky Linux / CentOS
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -418,6 +423,8 @@ On RHEL 7, container resource limits cannot be applied as v1 cgroups are used by
 default. ``runc`` is the recommended low-level runtime, and is listed as a
 requirement by {Singularity} RPM packages. The ``--no-setgroups`` option, to
 preserve host supplementary group membership, is not supported by ``runc``.
+Building Dockerfiles with ``singularity build --oci`` is not supported on RHEL
+7.
 
 SLES / openSUSE Leap
 ^^^^^^^^^^^^^^^^^^^^
@@ -427,8 +434,9 @@ by default. ``runc`` is the recommended low-level runtime, and is listed as a
 requirement by {Singularity} RPM packages. The ``--no-setgroups`` option, to
 preserve host supplementary group membership, is not supported by ``runc``.
 
-OCI-mode is not supported on SLES12. The kernel does not support FUSE in
-unprivileged user namespaces nor does it support unprivileged kernel overlays.
+OCI-mode, including building Dockerfiles with ``singularity build --oci``, is
+not supported on SLES12. The kernel does not support FUSE in unprivileged user
+namespaces nor does it support unprivileged kernel overlays.
 
 Ubuntu
 ^^^^^^
