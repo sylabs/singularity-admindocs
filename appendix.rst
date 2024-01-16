@@ -17,8 +17,6 @@ ownership and permissions required to use the `setuid` workflow:
 
    # Configuration files
    etc root:root 755 (drwxr-xr-x)
-   etc/bash_completion.d root:root 755 (drwxr-xr-x)
-   etc/bash_completion.d/singularity root:root 644 (-rw-r--r--)
    etc/singularity root:root 755 (drwxr-xr-x)
    etc/singularity/singularity.conf root:root 644 (-rw-r--r--)
    etc/singularity/remote.yaml root:root 644 (-rw-r--r--)
@@ -43,6 +41,7 @@ ownership and permissions required to use the `setuid` workflow:
    libexec/singularity root:root 755 (drwxr-xr-x)
    libexec/singularity/bin root:root 755 (drwxr-xr-x)
    libexec/singularity/bin/conmon root:root 755 (-rwxr-xr-x)
+   libexec/singularity/bin/singularity-buildkitd root:root 755 (-rwxr-xr-x)
    libexec/singularity/bin/squashfuse_ll root:root 755 (-rwxr-xr-x)
    libexec/singularity/bin/starter root:root 755 (-rwxr-xr-x)
    libexec/singularity/bin/starter-suid root:root 4755 (-rwsr-xr-x)
@@ -67,8 +66,11 @@ ownership and permissions required to use the `setuid` workflow:
    libexec/singularity/cni/vlan root:root 755 (-rwxr-xr-x) 
    libexec/singularity/cni/vrf root:root 755 (-rwxr-xr-x)
 
-   # Documentation (man pages)
+   # Documentation (man pages / bash completions)
    share root:root 755 (drwxr-xr-x)
+   share/bash-completion root:root 755 (drwxr-xr-x)
+   share/bash-completion/completions root:root 755 (drwxr-xr-x)
+   share/bash-completion/completions/singularity root:root 644 (-rw-r--r--)
    share/man root:root 755 (drwxr-xr-x)
    share/man/man1 root:root 755 (drwxr-xr-x)
    share/man/man1/singularity.1 root:root 644 (-rw-r--r--)
