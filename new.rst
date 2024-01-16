@@ -1,83 +1,59 @@
 .. _whats_new:
 
 ###############################
-What's New in {Singularity} 4.0
+What's New in {Singularity} 4.1
 ###############################
 
-This section highlights important changes in {Singularity} 4.0 that are of note
+This section highlights important changes in {Singularity} 4.1 that are of note
 to system administrators. See also the "What's New" section in the User Guide
 for user-facing changes.
 
-*****************
-OCI-Compatibility
-*****************
+If you are upgrading from a 3.x version of {Singularity} we recommend also
+reviewing the `"What's New" section for 4.0 <https://docs.sylabs.io/guides/{adminversion}/admin-guide/new.html>`__.
 
-- {Singularity}'s `OCI-mode
-  <https://docs.sylabs.io/guides/{userversion}/user-guide/oci_runtime.html>`__,
-  which was experimental in 3.11, is now expanded and fully supported. It is
-  enabled via ``--oci`` on the command line, or by setting ``oci mode = true``
-  in ``singularity.conf``.
-- OCI-mode runs containers unprivileged, using a low-level OCI runtime rather
-  than {Singularity}'s own native runtime. {Singularity}'s setuid starter
-  executable is not used on OCI-mode, even when setuid is enabled for the native
-  runtime.
-- OCI-mode uses `OCI-SIF images
-  <https://docs.sylabs.io/guides/{userversion}/user-guide/oci_runtime.html#oci-sif-images>`__,
-  a variant of the Singularity Image Format. These images cannot be run using
-  earlier versions of {Singularity}.
-- OCI-mode supports the `Container Device Interface
-  <https://docs.sylabs.io/guides/{userversion}/user-guide/oci_runtime.html#container-device-interface-cdi>`__
-  (CDI) standard for enabling access to GPUs and other devices within
-  containers.
+********
+OCI-Mode
+********
+
+- {Singularity} will now build OCI-SIF images from Dockerfiles, if the
+  ``--oci`` flag is used with the build command. Dockerfile builds are performed
+  by ``buildkitd``. If a ``buildkitd`` instance is not running on the host,
+  {Singularity} will use its own customized ephemeral
+  ``singularity-buildkitd``. To disable the customized ephemeral buildkitd,
+  remove ``libexec/singularity/bin/singularity-buildkitd``, or remove execute
+  permissions from this binary.
+- A new ``--keep-layers`` flag, for the ``pull`` and ``run/shell/exec/instance
+  start`` commands, allows individual layers to be preserved when an OCI-SIF
+  image is created from an OCI source. Multi layer OCI-SIF images can be run
+  with {Singularity} 4.1 and later, and are not supported with earlier
+  versions.
 
 ************
 Requirements
 ************
 
-- {Singularity} uses ``squashfuse_ll`` or ``squashfuse``, which is now built
-  from a git submodule unless ``--without-squashfuse`` is specified as an
-  argument to ``mconfig``. When built with ``--without-squashfuse``,
-  ``squashfuse_ll`` or ``squashfuse`` should be located on ``PATH``. Version
-  0.2.0 or later is required.
-- OCI-mode requires ``sqfstar`` or ``tar2sqfs`` to be :ref:`installed on the
-  system <sqfstar>` in order to create OCI-SIF images.
-- OCI-mode requires ``fuse-overlayfs`` to be installed on the system (from a
-  distribution package), to fully support unprivileged overlays.
-- OCI-mode requires that either ``runc`` or ``crun`` is installed on the system
-  (from a distribution package).
-- OCI-mode requires that subuid/subgid mappings have been configured for users,
-  in the same manner as documented for the :ref:`fakeroot <fakeroot>` feature.
+- ``fuse2fs`` is required to mount legacy extfs container images via FUSE when
+  kernel extfs mounts are disabled or unavailable. If ``fuse2fs`` is not
+  available, {Singularity} will fall back to extracting containers to a
+  temporary sandbox directory for execution.
+- Kernel 4.18 or above is required for Dockerfile builds. EL 7 does not support
+  Dockerfile builds, and continues to have limited support for other OCI-mode
+  features. SLES 12 has no support for OCI-Mode, including Dockerfile builds.
+- {Singularity} 4.1 is the final version that will support EL 7 and SLES 12. The
+  mainstream end-of-life dates for these distributions are 2024-06-30 and
+  2024-10-31 respectively.
 
-*********
-Packaging
-*********
+*************
+Configuration
+*************
 
-- RPM packages now use ``/var/lib/singularity`` (rather than
-  ``/var/singularity``) to store local state files.
-- Bash completions are now installed to the modern
-  ``share/bash-completion/completions`` location, rather than under ``etc``.
-
-***
-CLI
-***
-
-- The :ref:`keyserver management commands <keyserver>` that were under remote
-  have been moved to their own, dedicated keyserver command. Run ``singularity
-  help keyserver`` for more information.
-
-*******
-Caching
-*******
-
-- Caching of OCI blobs is now architecture aware. If older versions of
-  {Singularity} are not being used in parallel, users should run ``singularity
-  cache clean`` to recover space used by obsolete cached blobs.
-
-*******
-Plugins
-*******
-
-- Support for image driver plugins, deprecated at 3.11, has been removed.
-  Unprivileged kernel overlay is supported without a plugin. In
-  ``singularity.conf``, the ``image driver`` directive has been removed, and
-  ``enable overlay`` no longer supports the ``driver`` option.
+- The ``sif fuse`` option in ``singularity.conf``, which previously enabled
+  experimental FUSE mounts of container images in some execution flows, is
+  deprecated. When kernel mounts are disabled or unavailable, {Singularity}
+  4.1 now uses FUSE by default, with fall-back to extraction to a temporary
+  sandbox directory.
+- A new ``tmp sandbox`` option in ``singularity.conf`` can be used to disable
+  fall-back extraction of container images to temporary sandbox directories when
+  kernel or FUSE mounts are unavailable. This option may be useful to avoid
+  excessive filesystem load from implicit extraction of very large container
+  images.
