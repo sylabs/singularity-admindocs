@@ -127,8 +127,8 @@ namespace when running their containers through the ``--pid`` flag.
    resource managers, as well as some MPI implementations.
 
 ``allow uts ns``: Likewise, this option determines whether users can make use
-of the UTS namespace when running their containers. This affects the effect
-of the ``--uts`` and ``--hostname`` flags.
+of the UTS namespace when running their containers. If sets to ``no``, it
+disables the ``--uts`` and ``--hostname`` flags.
 
 Configuration Files
 ===================
