@@ -126,6 +126,10 @@ namespace when running their containers through the ``--pid`` flag.
    Using the PID namespace can confuse the process tracking of some
    resource managers, as well as some MPI implementations.
 
+``allow user ns``: This option controls the creation of user namespaces. If
+set to ``no``, this will prevent execution of containers with the ``--userns``
+or ``--fakeroot`` flags, and unprivileged installations of SingularityCE.
+
 ``allow uts ns``: Likewise, this option determines whether users can make use
 of the UTS namespace when running their containers. If sets to ``no``, it
 disables the ``--uts`` and ``--hostname`` flags.
