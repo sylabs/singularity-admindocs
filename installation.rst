@@ -155,7 +155,7 @@ distributions using their native tooling:
 -  ``mount``, ``umount``, ``pacstrap`` for Arch Linux.
 -  ``mount``, ``umount``, ``mknod``, ``debootstrap`` for Debian based
    distributions.
--  ``dnf`` or ``yum``, ``rpm``, ``curl`` for EL derived RPM based
+-  ``dnf``, ``rpm``, ``curl`` for EL derived RPM based
    distributions.
 -  ``uname``, ``zypper``, ``SUSEConnect`` for SLES derived RPM based
    distributions.
@@ -180,23 +180,19 @@ On Debian/Ubuntu ``squashfs-tools-ng`` is available in the distribution
 repositories. It has been included in the "Install system dependencies" step
 above. No further action is necessary.
 
-RHEL / Alma Linux / Rocky Linux / CentOS
-""""""""""""""""""""""""""""""""""""""""
+RHEL / Alma Linux / Rocky Linux
+"""""""""""""""""""""""""""""""
 
 On RHEL and derivatives, the ``squashfs-tools-ng`` package is now
 available in the EPEL repositories.
 
 Follow the `EPEL Quickstart <https://docs.fedoraproject.org/en-US/epel/#_quickstart>`__
 for you distribution to enable the EPEL repository. Install ``squashfs-tools-ng`` with
-``dnf`` or ``yum``.
+``dnf``.
 
 .. code::
 
-   # EL 8 / 9
    sudo dnf install squashfs-tools-ng
-
-   # EL 7
-   sudo yum install squashfs-tools-ng
 
 
 SLES / openSUSE Leap
@@ -210,13 +206,13 @@ Non-standard ldconfig / Nix & Guix Environments
 -----------------------------------------------
 
 If {Singularity} is installed under a package manager such as Nix or
-Guix, but on top of a standard Linux distribution (e.g. CentOS or
+Guix, but on top of a standard Linux distribution (e.g. RHEL or
 Debian), it may be unable to correctly find the libraries for ``--nv``
 and ``--rocm`` GPU support. This issue occurs as the package manager
 supplies an alternative ``ldconfig``, which does not identify GPU
 libraries installed from host packages.
 
-To allow {Singularity} to locate the host (i.e. CentOS / Debian) GPU
+To allow {Singularity} to locate the host (i.e. RHEL / Debian) GPU
 libraries correctly, set ``ldconfig path`` in ``singularity.conf`` to
 point to the host ``ldconfig``. I.E. it should be set to
 ``/sbin/ldconfig`` or ``/sbin/ldconfig.real`` rather than a Nix or Guix
@@ -409,8 +405,8 @@ Some distributions that use earlier kernels may have backported functionality
 that allows OCI-Mode to be used, but certain features may be limited as below.
 Distributions using v1 cgroups also have limitations, discussed below.
 
-RHEL / Alma Linux / Rocky Linux / CentOS
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RHEL / Alma Linux / Rocky Linux
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 On RHEL 9, all features of OCI-mode are supported. ``crun`` is the recommended
 low-level runtime, and is listed as a requirement by {Singularity} RPM packages.
@@ -418,13 +414,6 @@ low-level runtime, and is listed as a requirement by {Singularity} RPM packages.
 On RHEL 8, container resource limits cannot be applied as v1 cgroups are used by
 default. ``crun`` is the recommended low-level runtime, and is listed as a
 requirement by {Singularity} RPM packages.
-
-On RHEL 7, container resource limits cannot be applied as v1 cgroups are used by
-default. ``runc`` is the recommended low-level runtime, and is listed as a
-requirement by {Singularity} RPM packages. The ``--no-setgroups`` option, to
-preserve host supplementary group membership, is not supported by ``runc``.
-Building Dockerfiles with ``singularity build --oci`` is not supported on RHEL
-7.
 
 SLES / openSUSE Leap
 ^^^^^^^^^^^^^^^^^^^^
@@ -516,9 +505,9 @@ On versions 8 or later of RHEL / Alma Linux / Rocky Linux, as well as on Fedora:
 .. code::
 
    # Install basic tools for compiling
-   sudo yum groupinstall -y 'Development Tools'
+   sudo dnf groupinstall -y 'Development Tools'
    # Install RPM packages for dependencies
-   sudo yum install -y \
+   sudo dnf install -y \
       autoconf \
       automake \
       crun \
@@ -530,29 +519,6 @@ On versions 8 or later of RHEL / Alma Linux / Rocky Linux, as well as on Fedora:
       glib2-devel \
       libseccomp-devel \
       libtool \
-      squashfs-tools \
-      wget \
-      zlib-devel
-
-On version 7 of RHEL / CentOS:
-
-.. code::
-
-   # Install basic tools for compiling
-   sudo yum groupinstall -y 'Development Tools'
-   # Install RPM packages for dependencies
-   sudo yum install -y \
-      autoconf \
-      automake \
-      cryptsetup \
-      fuse \
-      fuse3 \
-      fuse3-devel \
-      git \
-      glib2-devel \
-      libseccomp-devel \
-      libtool \
-      runc \
       squashfs-tools \
       wget \
       zlib-devel
@@ -808,10 +774,10 @@ continues to work in new shells. (Adjust the path if you installed
 Build and install an RPM
 ========================
 
-If you use RHEL, CentOS or SUSE, building and installing a Singularity RPM
-allows your {Singularity} installation to be more easily managed, upgraded and
-removed. You can build an RPM directly from the `release tarball
-<https://github.com/sylabs/singularity/releases>`_.
+If you use RHEL, RHEL derivatives, or SUSE, building and installing a
+Singularity RPM allows your {Singularity} installation to be more easily
+managed, upgraded and removed. You can build an RPM directly from the `release
+tarball <https://github.com/sylabs/singularity/releases>`_.
 
 .. note::
 
@@ -828,7 +794,7 @@ download the tarball and build and install the RPM.
    $ export VERSION={InstallationVersion} && # adjust this as necessary \
        wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-ce-${VERSION}.tar.gz && \
        rpmbuild -tb singularity-ce-${VERSION}.tar.gz && \
-       sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/singularity-ce-$VERSION-1.el7.x86_64.rpm && \
+       sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/singularity-ce-$VERSION-1.el9.x86_64.rpm && \
        rm -rf ~/rpmbuild singularity-ce-$VERSION*.tar.gz
 
 If you encounter a failed dependency error for golang but installed it
@@ -864,7 +830,7 @@ install Singularity:
 
    $ ./mconfig && \
    make -C builddir rpm && \
-   sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/singularity-ce-{InstallationVersion}.el7.x86_64.rpm # or whatever version you built
+   sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/singularity-ce-{InstallationVersion}.el9.x86_64.rpm # or whatever version you built
 
 To build an rpm with an alternative install prefix set ``RPMPREFIX`` on
 the make step, for example:
