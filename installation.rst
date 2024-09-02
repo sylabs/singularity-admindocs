@@ -138,7 +138,8 @@ runtime:
   OCI sources, in OCI-mode (``--oci``).
 
 - ``fuse2fs`` is used to mount extfs images in unprivileged flows, or when
-  kernel extfs mount is disabled by configuration.
+  kernel extfs mount is disabled by configuration. Version 1.46.6 or above is
+  required to use OCI-SIF embedded overlays in OCI-mode.
 
 - ``fuse-overlayfs`` is used to setup overlay filesystems when the kernel does
   not support unprivileged overlay or the required overlay configuration.
