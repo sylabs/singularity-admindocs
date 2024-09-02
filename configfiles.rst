@@ -115,6 +115,8 @@ to their configuration file:
    Administrators who wish to disable this fallback behavior can do so via the
    ``tmp sandbox = no`` option discussed :ref:`below <sec:tmpsandbox>`.
 
+.. _sec:nsoptions:
+
 Namespace Options
 =================
 
@@ -367,6 +369,8 @@ will be used to mount an extfs container image in user space. If ``fuse2fs`` is
 not available, or fails, the image will be extracted to a directory for
 execution.
 
+.. _sec:networkoptions:
+
 Networking Options
 ==================
 
@@ -374,31 +378,42 @@ The ``--network`` option can be used to specify a CNI networking
 configuration that will be used when running a container with `network
 virtualization
 <https://sylabs.io/guides/{userversion}/user-guide/networking.html>`_.
-Unrestricted use of CNI network configurations requires root privilege,
-as certain configurations may disrupt the host networking environment.
 
-{Singularity} 3.8 allows specific users or groups to be granted the
-ability to run containers with administrator specified CNI
-configurations.
+The ``--netns-path`` option (from {Singularity} 4.2) can be used to join an
+existing network namespace when running a container.
 
-``allow net users``: Allow specified root administered CNI network
-configurations to be used by the specified list of users. By default
-only root may use CNI configuration, except in the case of a fakeroot
-execution where only 40_fakeroot.conflist is used. This feature only
-applies when {Singularity} is running in SUID mode and the user is
-non-root.
+Unrestricted use of CNI network configurations, and joining arbitrary existing
+network namespaces, requires root privilege as certain configurations may
+disrupt the host networking environment or allow access to restricted network
+resources.
 
-``allow net groups``: Allow specified root administered CNI network
-configurations to be used by the specified list of users. By default
-only root may use CNI configuration, except in the case of a fakeroot
-execution where only 40_fakeroot.conflist is used. This feature only
-applies when {Singularity} is running in SUID mode and the user is
-non-root.
+{Singularity} allows specific users or groups to be granted the ability to run
+containers with administrator specified CNI configurations, and to join network
+namespaces exposed at specified paths.
 
-``allow net networks``: Specify the names of CNI network configurations
-that may be used by users and groups listed in the allow net users /
-allow net groups directives. Thus feature only applies when
-{Singularity} is running in SUID mode and the user is non-root.
+``allow net users``: A list of non-root users that are permitted to use the CNI
+configurations specified in the ``allow net networks`` directive, and can join
+existing network namespaces listed in the ``allow netns paths`` directive. By
+default only root may use CNI configurations, or join existing network
+namespaces, except in the case of a fakeroot execution where only the
+``40_fakeroot.conflist`` CNI configuration is used.
+
+``allow net groups``: A list of non-root groups that are permitted to use the
+CNI configurations specified in the ``allow net networks`` directive, and can
+join existing network namespaces listed in the ``allow netns paths`` directive.
+By default only root may use CNI configurations, or join existing network
+namespaces, except in the case of a fakeroot execution where only the
+``40_fakeroot.conflist`` CNI configuration is used. 
+
+``allow net networks``: Specify the names of CNI network configurations that may
+be used by users and groups listed in the ``allow net users`` / ``allow net
+groups`` directives. Thus feature only applies when {Singularity} is running in
+SUID mode and the user is non-root.
+
+``allow netns paths``: Specify the paths to network namespaces that may be
+joined by users and groups listed in the ``allow net users`` / ``allow net
+groups`` directives. This restriction only applies when Singularity is running
+in SUID mode and the user is non-root.
 
 GPU Options
 ===========
