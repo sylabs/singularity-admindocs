@@ -131,13 +131,22 @@ install those binaries on your system.
 Basics
 ======
 
-Fakeroot relies on ``/etc/subuid`` and ``/etc/subgid`` files to find
-configured mappings from real user and group IDs, to a range of
-otherwise vacant IDs for each user on the host system that can be
-remapped in the user namespace. A user must have an entry in these system
-configuration files to use the fakeroot feature. {Singularity} provides
-a :ref:`config fakeroot <config-fakeroot>` command to assist in managing
-these files, but it is important to understand how they work.
+To obtain the subuid and subgid mappings for a user, {Singularity} will either:
+
+- Use libsubid, if compiled with support for this library.
+- Use the ``/etc/subuid`` and ``/etc/subgid`` files directly, if compiled
+  without libsubid support.
+
+If compiled with libsubid support, the source of the mappings is controlled by
+the ``subid`` entry in ``/etc/nsswitch.conf``. This will generally be ``files``,
+in which case libsubid uses the local ``/etc/subuid`` and ``/etc/subgid`` files.
+Some distributions support using e.g. an LDAP source, via ``sss``, when
+configured by the administrator.
+
+When the ``/etc/subuid`` and ``/etc/subgid`` files are used as the source of
+mappings, a user must have an entry inside them to use the fakeroot feature.
+{Singularity} provides a :ref:`config fakeroot <config-fakeroot>` command to
+assist in managing these files, but it is important to understand how they work.
 
 For user ``foo`` an entry in ``/etc/subuid`` might be:
 
