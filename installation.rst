@@ -196,13 +196,6 @@ for you distribution to enable the EPEL repository. Install ``squashfs-tools-ng`
    sudo dnf install squashfs-tools-ng
 
 
-SLES / openSUSE Leap
-""""""""""""""""""""
-
-On SLES/openSUSE, follow the instructions at the `filesystems
-project <https://software.opensuse.org//download.html?project=filesystems&package=squashfs>`__
-to obtain an more recent `squashfs` package that provides ``sqfstar``.
-
 Non-standard ldconfig / Nix & Guix Environments
 -----------------------------------------------
 
@@ -416,18 +409,6 @@ On RHEL 8, container resource limits cannot be applied as v1 cgroups are used by
 default. ``crun`` is the recommended low-level runtime, and is listed as a
 requirement by {Singularity} RPM packages.
 
-SLES / openSUSE Leap
-^^^^^^^^^^^^^^^^^^^^
-
-On SLES 15, container resource limits cannot be applied as v1 cgroups are used
-by default. ``runc`` is the recommended low-level runtime, and is listed as a
-requirement by {Singularity} RPM packages. The ``--no-setgroups`` option, to
-preserve host supplementary group membership, is not supported by ``runc``.
-
-OCI-mode, including building Dockerfiles with ``singularity build --oci``, is
-not supported on SLES12. The kernel does not support FUSE in unprivileged user
-namespaces nor does it support unprivileged kernel overlays.
-
 Ubuntu
 ^^^^^^
 
@@ -521,31 +502,6 @@ On versions 8 or later of RHEL / Alma Linux / Rocky Linux, as well as on Fedora:
       libseccomp-devel \
       libtool \
       squashfs-tools \
-      wget \
-      zlib-devel
-
-On SLES / openSUSE Leap:
-
-.. code::
-
-   # Install RPM packages for dependencies
-   sudo zypper in \
-      autoconf \
-      automake \
-      cryptsetup \
-      fuse2fs \
-      fuse3 \
-      fuse3-devel \
-      gcc \
-      gcc-c++ \
-      git \
-      glib2-devel \
-      libseccomp-devel \
-      libtool \
-      make \
-      pkg-config \
-      runc \
-      squashfs \
       wget \
       zlib-devel
 

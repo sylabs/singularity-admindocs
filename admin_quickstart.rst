@@ -269,31 +269,6 @@ On versions 8 or later of RHEL / Alma Linux / Rocky Linux, as well as on Fedora:
       wget \
       zlib-devel
 
-On SLES / openSUSE Leap 15:
-
-.. code::
-
-   # Install RPM packages for dependencies
-   sudo zypper in \
-      autoconf \
-      automake \
-      cryptsetup \
-      fuse2fs \
-      fuse3 \
-      fuse3-devel \
-      gcc \
-      gcc-c++ \
-      git \
-      glib2-devel \
-      libseccomp-devel \
-      libtool \
-      make \
-      pkg-config \
-      runc \
-      squashfs \
-      wget \
-      zlib-devel
-
 .. note::
 
    You can build {Singularity} without ``cryptsetup`` available, but you will
@@ -333,15 +308,6 @@ for you distribution to enable the EPEL repository. Install ``squashfs-tools-ng`
 .. code::
 
    sudo dnf install squashfs-tools-ng
-
-
-SLES / openSUSE Leap
---------------------
-
-On SLES/openSUSE, follow the instructions at the `filesystems
-project <https://software.opensuse.org//download.html?project=filesystems&package=squashfs>`__
-to obtain an more recent `squashfs` package that provides ``sqfstar``.
-
 
 Install Go
 ==========
