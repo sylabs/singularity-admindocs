@@ -6,10 +6,10 @@ orbs:
 executors:
   node:
     docker:
-      - image: node:20-slim
+      - image: node:22-slim
   python:
     docker:
-      - image: python:3.12-bullseye
+      - image: python:3.12-bookworm
 
 commands:
   apt-update:
