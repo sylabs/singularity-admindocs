@@ -193,7 +193,10 @@ creating the container, and the 3.x minor version used to run the container:
 {Singularity} 4.1 will build container images that can be run with version 4.0,
 with the exception of multi-layer OCI-SIF images. A multi-layer OCI-SIF created
 with the 4.1 ``--keep-layers`` option must be executed using version 4.1 or
-later. 
+later.
+
+{Singularity} 4.3 can add a cosign-compatible signature to OCI-SIF images. These
+cosign signed OCI-SIF images are not compatible with version 4.2 or older.
 
 **************************
  Installation from Source
