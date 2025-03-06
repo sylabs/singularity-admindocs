@@ -15,7 +15,7 @@ information about how to use {Singularity}.
 .. toctree::
    :maxdepth: 2
 
-   What's New in {Singularity} 4.2 <new>
+   What's New in {Singularity} 4.3 <new>
 
    Admin Quickstart <admin_quickstart>
    Installing {Singularity} <installation>
