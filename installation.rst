@@ -68,9 +68,6 @@ tools, in which case they will be searched for on ``$PATH`` at runtime.
   from OCI-SIF images in OCI-mode. They may be used to mount squashfs
   filesystems from SIF images and bare squashfs containers in non-OCI mode.
 
-- ``conmon`` is used to manage monitoring and attaching to non-interactive
-  containers started with the ``singularity oci start`` command.
-
 Configurable Paths
 ^^^^^^^^^^^^^^^^^^
 
@@ -113,6 +110,9 @@ runtime:
 -  ``true``
 
 -  ``mkfs.ext3`` is used to create overlay images.
+
+- ``conmon`` is used for the ``singularity oci`` commands, but not ``--oci``
+  mode.
 
 -  ``cp``
 
@@ -196,12 +196,38 @@ for you distribution to enable the EPEL repository. Install ``squashfs-tools-ng`
    sudo dnf install squashfs-tools-ng
 
 
-SLES / openSUSE Leap
-""""""""""""""""""""
+Installing conmon for singularity oci commands
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-On SLES/openSUSE, follow the instructions at the `filesystems
-project <https://software.opensuse.org//download.html?project=filesystems&package=squashfs>`__
-to obtain an more recent `squashfs` package that provides ``sqfstar``.
+If you intend to use the `singularity oci` commands, to run Singularity
+containers in an OCI lifecycle then `conmon` is required.
+
+Debian / Ubuntu
+"""""""""""""""
+
+``conmon`` is available as a package for Ubuntu 24.10+ and Debian 12+
+
+.. code::
+
+   sudo apt get install conmon
+
+On older versions, use the latest binary from the `conmon GitHub releases
+<https://github.com/containers/conmon/releases>`_ page. E.g.
+
+.. code::
+
+   sudo curl -L -o /usr/local/bin/conmon https://github.com/containers/conmon/releases/download/v2.1.13/conmon.amd64
+   sudo chmod +x /usr/local/bin/conmon
+
+
+EL / Fedora
+"""""""""""
+
+Install the distribution ``conmon`` package.
+
+.. code::
+   sudo dnf install conmon
+
 
 Non-standard ldconfig / Nix & Guix Environments
 -----------------------------------------------
@@ -416,18 +442,6 @@ On RHEL 8, container resource limits cannot be applied as v1 cgroups are used by
 default. ``crun`` is the recommended low-level runtime, and is listed as a
 requirement by {Singularity} RPM packages.
 
-SLES / openSUSE Leap
-^^^^^^^^^^^^^^^^^^^^
-
-On SLES 15, container resource limits cannot be applied as v1 cgroups are used
-by default. ``runc`` is the recommended low-level runtime, and is listed as a
-requirement by {Singularity} RPM packages. The ``--no-setgroups`` option, to
-preserve host supplementary group membership, is not supported by ``runc``.
-
-OCI-mode, including building Dockerfiles with ``singularity build --oci``, is
-not supported on SLES12. The kernel does not support FUSE in unprivileged user
-namespaces nor does it support unprivileged kernel overlays.
-
 Ubuntu
 ^^^^^^
 
@@ -486,11 +500,10 @@ On Debian-based systems, including Ubuntu:
       autoconf \
       automake \
       cryptsetup \
-      fuse \
       fuse2fs \
       git \
+      fuse \
       libfuse-dev \
-      libglib2.0-dev \
       libseccomp-dev \
       libtool \
       pkg-config \
@@ -501,7 +514,21 @@ On Debian-based systems, including Ubuntu:
       wget \
       zlib1g-dev
 
-On versions 8 or later of RHEL / Alma Linux / Rocky Linux, as well as on Fedora:
+On Ubuntu 24.04 and above install additional libsubid headers:
+
+.. code::
+
+   sudo apt-get install -y libsubid-dev
+
+On RHEL / Alma Linux / Rocky Linux, CentOS Stream, you will need to enable the
+CRB (9+) or powertools repository (8). This is not necessary on Fedora.
+
+.. code::
+
+   sudo dnf install -y dnf-plugins-core
+   sudo dnf config-manager --enable crb || dnf config-manager --enable powertools
+
+You can now install the build dependencies:
 
 .. code::
 
@@ -517,35 +544,10 @@ On versions 8 or later of RHEL / Alma Linux / Rocky Linux, as well as on Fedora:
       fuse3 \
       fuse3-devel \
       git \
-      glib2-devel \
       libseccomp-devel \
       libtool \
+      shadow-utils-subid-devel \
       squashfs-tools \
-      wget \
-      zlib-devel
-
-On SLES / openSUSE Leap:
-
-.. code::
-
-   # Install RPM packages for dependencies
-   sudo zypper in \
-      autoconf \
-      automake \
-      cryptsetup \
-      fuse2fs \
-      fuse3 \
-      fuse3-devel \
-      gcc \
-      gcc-c++ \
-      git \
-      glib2-devel \
-      libseccomp-devel \
-      libtool \
-      make \
-      pkg-config \
-      runc \
-      squashfs \
       wget \
       zlib-devel
 
@@ -696,6 +698,10 @@ For a full list of ``mconfig`` options, run ``mconfig --help``. Here are
 some of the most common options that you may need to use when building
 {Singularity} from source.
 
+- ``--without-libsubid``: Disable libsubid support, on distributions where it is
+  not available. This prevents subuid/subgid mappings being retrieved from a
+  source other than ``/etc/subuid`` / ``/etc/subgid`` files.
+
 -  ``--sysconfdir``: Install read-only config files in sysconfdir. This
    option is important if you need the ``singularity.conf`` file or
    other configuration files in a custom location.
@@ -708,11 +714,6 @@ some of the most common options that you may need to use when building
 
 -  ``-b``: Build {Singularity} in a given directory. By default this is
    ``./builddir``.
-
--  ``--without-conmon``: Do not build the ``conmon`` OCI container monitor. Use
-   this option if you are certain you will not use the ``singularity oci``
-   commands, or wish to use conmon >=2.0.24 provided by your distribution, and
-   available on ``$PATH``.
 
 - ``--reproducible``: Enable support for reproducible builds. Ensures
    that the compiled binaries do not include any temporary paths, the

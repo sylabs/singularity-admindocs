@@ -231,11 +231,10 @@ On Debian-based systems, including Ubuntu:
       autoconf \
       automake \
       cryptsetup \
-      fuse \
       fuse2fs \
       git \
+      fuse \
       libfuse-dev \
-      libglib2.0-dev \
       libseccomp-dev \
       libtool \
       pkg-config \
@@ -246,7 +245,21 @@ On Debian-based systems, including Ubuntu:
       wget \
       zlib1g-dev
 
-On versions 8 or later of RHEL / Alma Linux / Rocky Linux, as well as on Fedora:
+On Ubuntu 24.04 and above install additional libsubid headers:
+
+.. code::
+
+   sudo apt-get install -y libsubid-dev
+
+On RHEL / Alma Linux / Rocky Linux, CentOS Stream, you will need to enable the
+CRB (9+) or powertools repository (8). This is not necessary on Fedora.
+
+.. code::
+
+   sudo dnf install -y dnf-plugins-core
+   sudo dnf config-manager --enable crb || dnf config-manager --enable powertools
+
+You can now install the build dependencies:
 
 .. code::
 
@@ -262,35 +275,10 @@ On versions 8 or later of RHEL / Alma Linux / Rocky Linux, as well as on Fedora:
       fuse3 \
       fuse3-devel \
       git \
-      glib2-devel \
       libseccomp-devel \
       libtool \
+      shadow-utils-subid-devel \
       squashfs-tools \
-      wget \
-      zlib-devel
-
-On SLES / openSUSE Leap 15:
-
-.. code::
-
-   # Install RPM packages for dependencies
-   sudo zypper in \
-      autoconf \
-      automake \
-      cryptsetup \
-      fuse2fs \
-      fuse3 \
-      fuse3-devel \
-      gcc \
-      gcc-c++ \
-      git \
-      glib2-devel \
-      libseccomp-devel \
-      libtool \
-      make \
-      pkg-config \
-      runc \
-      squashfs \
       wget \
       zlib-devel
 
@@ -302,8 +290,8 @@ On SLES / openSUSE Leap 15:
    If you will not use the ``singularity oci`` commands, or OCI-mode, ``crun`` /
    ``runc`` is not required.
 
-Install sqfstar / tar2sqfs for OCI-mode
-=======================================
+Recommended: Install sqfstar / tar2sqfs for OCI-mode
+====================================================
 
 If you intend to use the ``--oci`` execution mode of SingularityCE, your system
 must provide either:
@@ -311,7 +299,7 @@ must provide either:
 - ``squashfs-tools / squashfs`` >= 4.5, which provides the ``sqfstar`` utility.
   Older versions packaged by many distributions do not include ``sqfstar``.
 - ``squashfs-tools-ng``, which provides the ``tar2sqfs`` utility. This is not
-  packaged by all distributions.
+  packaged by all distributions. 
 
 Debian / Ubuntu
 ---------------
@@ -334,14 +322,37 @@ for you distribution to enable the EPEL repository. Install ``squashfs-tools-ng`
 
    sudo dnf install squashfs-tools-ng
 
+Optional: Install conmon for singularity oci commands
+=====================================================
 
-SLES / openSUSE Leap
---------------------
+If you intend to use the `singularity oci` commands, to run Singularity
+containers in an OCI lifecycle then `conmon` is required.
 
-On SLES/openSUSE, follow the instructions at the `filesystems
-project <https://software.opensuse.org//download.html?project=filesystems&package=squashfs>`__
-to obtain an more recent `squashfs` package that provides ``sqfstar``.
+Debian / Ubuntu
+---------------
 
+``conmon`` is available as a package for Ubuntu 24.10+ and Debian 12+
+
+.. code::
+
+   sudo apt get install conmon
+
+On older versions, use the latest binary from the `conmon GitHub releases
+<https://github.com/containers/conmon/releases>`_ page. E.g.
+
+.. code::
+
+   sudo curl -L -o /usr/local/bin/conmon https://github.com/containers/conmon/releases/download/v2.1.13/conmon.amd64
+   sudo chmod +x /usr/local/bin/conmon
+
+
+EL / Fedora
+-----------
+
+Install the distribution ``conmon`` package.
+
+.. code::
+   sudo dnf install conmon
 
 Install Go
 ==========
@@ -434,6 +445,10 @@ For a full list of ``mconfig`` options, run ``mconfig --help``. Here are
 some of the most common options that you may need to use when building
 {Singularity} from source.
 
+- ``--without-libsubid``: Disable libsubid support, on distributions where it is
+  not available. This prevents subuid/subgid mappings being retrieved from a
+  source other than ``/etc/subuid`` / ``/etc/subgid`` files.
+
 -  ``--sysconfdir``: Install read-only config files in sysconfdir. This
    option is important if you need the ``singularity.conf`` file or
    other configuration files in a custom location.
@@ -446,15 +461,6 @@ some of the most common options that you may need to use when building
 
 -  ``-b``: Build {Singularity} in a given directory. By default this is
    ``./builddir``.
-
-- ``--without-conmon``: Do not build ``conmon``, a container monitor that is
-  used by the ``singularity oci`` commands. ``conmon`` is bundled with
-  {Singularity} and will be built and installed by default. Use
-  ``--without-conmon`` if you wish to use a version of ``conmon`` >=2.0.24 that
-  is provided by your distribution rather than the bundled version. You can also
-  specify ``--without-conmon`` if you know you will not use the ``singularity
-  oci`` commands.
-
 
 ************************************
  Installation from RPM/Deb Packages
