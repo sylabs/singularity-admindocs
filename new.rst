@@ -1,44 +1,35 @@
 .. _whats_new:
 
 ###############################
-What's New in {Singularity} 4.3
+What's New in {Singularity} 4.4
 ###############################
 
-This section highlights important changes in {Singularity} 4.3 that are of note
+This section highlights important changes in {Singularity} 4.4 that are of note
 to system administrators. See also the "What's New" section in the User Guide
 for user-facing changes.
 
-*************
-Configuration
-*************
+***********
+OCI Support
+***********
 
- - Support for libsubid. Subid mappings will be retrieved from e.g. LDAP
-   according to ``nssswitch.conf`` if Singularity is built with libsubid support
-   (default). If built without libsubid support, Singularity will retrieve subid
-   directly from ``/etc/subid`` and ``/etc/subgid`` regardless of system
-   configuration. Note that ``singularity config fakeroot`` always modifies the
-   ``/etc/subid`` and ``/etc/subgid`` files.
+- docker-daemon OCI image sources now buffer via a temporary file instead of
+  in-memory. Note that the file is created in ``$TMPDIR`` - the dependency involved
+  cannot be instructed to use ``$SINGULARITY_TMPDIR`` at this time.
+
+**************
+Native Runtime
+**************
+
+- Improved support for hosts that have ``/etc/resolv.conf`` pointing to a
+  symlink under ``/run``, such as those hosts that are running
+  ``systemd-resolved``.  In this case, the symlink is copied into the container
+  and the parent directory of the target of the symlink is bind-mounted from the
+  host. The result is that even if the target of the symlink is replaced with a
+  new file, the container sees the update in ``/etc/resolv.conf``.
+- Support for starting fakeroot from setuid mode while in an NFS directory.
 
 ************************
 Requirements & Packaging
 ************************
 
- - Go 1.23.4 or above is now required to build SingularityCE.
- - libsubid headers are now required to build SingularityCE, unless the
-   ``--without-libsubid`` flag is passed to ``mconfig``.
- - EL RPM packages are built with libsubid support.
- - Ubuntu deb packages are built without libsubid support.
- - The RPM spec file no longer includes rules for SLES / openSUSE package
-   builds, which have been untested / unsupported for some time.
- - Conmon sources are no longer bundled and built with SingularityCE. Install
-   the ``conmon`` package from your distribution, or upstream binary, if you
-   need to use the ``singularity oci`` commands. Note that conmon is not required
-   for ``--oci`` mode.
-
-****************
-Removed Features
-****************
-
-  - Plugin ``fakerootcallback`` functionality for customizing fakeroot subid
-    mappings has been removed. Use the libsubid integration to provide subid
-    mappings from a custom source.
+- Go 1.25.6 or above is now required to build SingularityCE.
