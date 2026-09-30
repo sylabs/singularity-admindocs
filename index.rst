@@ -23,5 +23,6 @@ information about how to use {Singularity}.
    User Namespaces & Fakeroot <user_namespace>
    Security in {Singularity} <security>
 
+   Plugins <plugins>
    Appendix <appendix>
    License <license>
