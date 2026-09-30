@@ -23,7 +23,7 @@ variable_replacements = {
     # diverge a bit from CE<->PRO due to long-term backports etc.
     "{Singularity}": "SingularityCE",
     # Version of Go to be used in install instructions
-    "{GoVersion}": "1.26.0"
+    "{GoVersion}": "1.26.4"
 }
 
 
