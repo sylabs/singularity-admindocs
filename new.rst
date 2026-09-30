@@ -1,35 +1,41 @@
 .. _whats_new:
 
 ###############################
-What's New in {Singularity} 4.4
+What's New in {Singularity} 4.5
 ###############################
 
-This section highlights important changes in {Singularity} 4.4 that are of note
-to system administrators. See also the "What's New" section in the User Guide
-for user-facing changes.
+SingularityCE 4.5.0 contains mostly internal code changes and defense-in-depth
+hardening. The majority of the changes made since release 4.4.2 do not alter
+behaviour, with the exception of specific points highlighted below.
 
-***********
-OCI Support
-***********
+Like many other open source projects, SingularityCE is increasingly the target
+of LLM driven analysis. The changes in 4.5.0 aim to minimise false positives,
+reduce maintainer burden, and provide defense-in-depth in areas where it is
+appropriate.
 
-- docker-daemon OCI image sources now buffer via a temporary file instead of
-  in-memory. Note that the file is created in ``$TMPDIR`` - the dependency involved
-  cannot be instructed to use ``$SINGULARITY_TMPDIR`` at this time.
+If you are a security researcher working on SingularityCE, please see the new
+AGENTS.md and SECURITY.md content, in the sylabs/singularity repository.
 
-**************
-Native Runtime
-**************
+If you are a developer, intending to contribute to SingularityCE, please review
+the LLM policy in CONTRIBUTING.md, in the sylabs/singularity repository.
 
-- Improved support for hosts that have ``/etc/resolv.conf`` pointing to a
-  symlink under ``/run``, such as those hosts that are running
-  ``systemd-resolved``.  In this case, the symlink is copied into the container
-  and the parent directory of the target of the symlink is bind-mounted from the
-  host. The result is that even if the target of the symlink is replaced with a
-  new file, the container sees the update in ``/etc/resolv.conf``.
-- Support for starting fakeroot from setuid mode while in an NFS directory.
+*****************
+Behaviour Changes
+*****************
 
-************************
-Requirements & Packaging
-************************
+- In setuid mode, root-ownership checks on ``singularity.conf`` and the capabilities
+  / ecl configuration now assert that these files are not writable except by the
+  root owner. Management of these files by an administrator group is no longer
+  possible. The files cannot be relocated by symlink.
 
-- Go 1.25.6 or above is now required to build SingularityCE.
+- External helper binaries executed with elevated privileges must also be
+  root-owned, regular executable files that are not writable by group or others.
+
+- The majority of files that may be created by SingularityCE (e.g. remote
+  configuration, pulled images), can no longer be created through a dangling
+  symlink.
+
+- If ``ecl.toml`` is missing, SIF execution is rejected rather than assuming an
+  inactive ECL configuration. The default install ships an activated = false
+  template, so standard installations are unaffected; sites with custom or
+  partial installs must ensure ``ecl.toml`` is present and valid.
