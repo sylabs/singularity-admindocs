@@ -20,14 +20,6 @@ all users to monitor new releases of {Singularity} for security
 information. Security patches are applied to the latest open-source
 release.
 
-SingularityPRO is a professionally curated and licensed version of
-{Singularity} that provides added security, stability, and support
-beyond that offered by the open source project. Security and bug-fix
-patches are backported to select versions of SingularityPRO, so that
-they can be deployed long-term where required. PRO users receive
-security fixes as detailed in the `Sylabs Security Policy
-<https://sylabs.io/security-policy>`__.
-
 ************
  Background
 ************
