@@ -260,6 +260,11 @@ Or you can specify different source and destination locations using:
 bind points at runtime. By Default, this option is set to ``YES``, which
 means users can specify bind points, scratch and tmp locations.
 
+``trusted bind paths``: If set to 'yes' disables the remount of bind mounts
+configured in ``singularity.conf``, so that they maintain the same mount flags
+as on the host. ``MS_NOSUID`` and ``MS_NODEV`` will not be forced. setuid
+execution is still blocked by ``PR_SET_NO_NEW_PRIVS``.
+
 Limiting Container Execution
 ============================
 
