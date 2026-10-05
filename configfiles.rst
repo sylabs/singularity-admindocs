@@ -260,6 +260,11 @@ Or you can specify different source and destination locations using:
 bind points at runtime. By Default, this option is set to ``YES``, which
 means users can specify bind points, scratch and tmp locations.
 
+``trusted bind paths``: If set to 'yes' disables the remount of bind mounts
+configured in ``singularity.conf``, so that they maintain the same mount flags
+as on the host. ``MS_NOSUID`` and ``MS_NODEV`` will not be forced. setuid
+execution is still blocked by ``PR_SET_NO_NEW_PRIVS``.
+
 Limiting Container Execution
 ============================
 
@@ -1330,3 +1335,148 @@ For more details on the ``keyserver`` command group and managing keyservers,
 please see the `Keyserver Management section
 <https://www.sylabs.io/guides/{userversion}/user-guide/keyserver.html>`_ of the
 user guide.
+
+.. _native-hooks:
+
+****************
+ native-hooks.d
+****************
+
+The ``etc/native-hooks.d`` directory can be used to configure runtime hooks, where
+{Singularity} will call an external binary at a specific point in the container
+lifecycle. For example, a ``poststart`` hook might be used to call a script that
+changes a configuration property for a network filesystem, specifically for the
+container that has been started.
+
+Hooks are defined as ``.json`` files in the ``native-hooks.d`` directory, and
+apply to the native runtime only, not OCI-Mode.
+
+The schema for hook configuration files follows that used by other runtimes,
+including podman and sarus, to configure OCI hooks. However, in {Singularity}
+there is limited support for hooks:
+
+* Only ``poststart`` hooks are allowed.
+* Hooks must be set to run ``always``. No other ``when`` conditions are supported.
+
+Native Hook JSON Schema
+=======================
+
+Native hook configuration files must conform to the following schema:
+
+- **version** (required) - Version of the schema. Must be set to ``1.0.0``.
+
+- **hook** (required) - A POSIX platform hook definition, `as specified the OCI runtime-spec <https://github.com/opencontainers/runtime-spec/blob/main/config.md#posix-platform-hooks>`__:
+  
+  - **path** (required) - The absolute path to the script or executable to be run.
+  
+  - **args** (optional) - an array of arguments to pass to the script or executable.
+
+  - **env** (optional) - an array of ``key=val`` pairs definining environment
+    variable that will be visible to the script or executable.
+
+- **when** (required) - Rules definining when the hook should run.
+
+  - **always** (required) - The hook should always run. Must be set to ``true``
+    in {Singularity} 4.1.
+
+- **stages** (required) - An array of stages in the container lifecycle when the
+  hook should run. Must be set to ``["poststart"]`` in {Singularity} 4.1.
+
+- **privileged** (optional) - A {Singularity} specific additional field,
+  indicating whether the hook exectutable should be run with privilege.
+
+
+Setuid Mode / Privileged Hooks
+==============================
+
+Some operations that an administrator requires a hook to perform could require
+privilege on the host. {Singularity} supports these operations in its set-uid
+mode, via the ``privileged`` property of a hook configuration file.
+
+When a hook is configured with ``privileged: true`` it will:
+
+ - Only be loaded and executed in the setuid flow, when {Singularity} is not run
+   within a user namespace.
+ - Call the script or exectuable specified in ``path`` as uid 0 (root).
+
+To safeguard against the introduction of malicious privileged hooks, the
+following requirements must be met when {Singularity} is run in set-uid mode:
+
+ - The ``etc/native-hooks.d`` directory must be owned by uid 0, gid 0 (root).
+ - Individual hook configuration files must be owned by uid 0, gid 0 (root).
+
+
+Types of Hooks
+==============
+
+poststart Hooks
+---------------
+
+A ``poststart`` hook runs a script or executable after the container process has
+started. An example configuration file is provided as
+``etc/native-hooks.d/poststart.json.example`` in a standard {Singularity}
+installation:
+
+.. code:: json
+
+   {
+    "version": "1.0.0",
+    "hook": {
+      "path": "/bin/true",
+      "args": ["arg1", "arg2"],
+      "env": [
+        "I_AM_A_HOOK=1"
+      ]
+    },
+    "when": {
+      "always": true
+    },
+    "stages": ["poststart"],
+    "privileged": false
+   }
+
+The script or executable (``/bin/true``) that is run by the hook will be run in
+the host namespaces, and receives the following:
+
+- Any arguments specified in the ``hook.args`` array of the configuration file.
+
+- Any environment variables specified in the ``hook.env`` array of the
+  configuration file.
+
+- A JSON formatted `OCI runtime state structure <https://github.com/opencontainers/runtime-spec/blob/main/runtime.md#state>`__,
+  passed to the STDIN of the script or executable.
+
+- A {Singularity} specific ``SINGULARITY_CONTAINER_PID`` environment variable,
+  allowing the hook to retrieve the container process ID without parsing it from
+  the OCI state JSON.
+
+- A {Singularity} specific ``SINGULARITY_CONTAINER`` environment variable,
+  allowing the hook to retrieve the container filename without parsing it from
+  the OCI state JSON.
+
+Debugging Hooks
+===============
+
+Any console output created by a hook is not shown by default. To view the output
+of a hook run ``singularity`` with the ``--debug`` flag, and examine the
+``DEBUG`` log messages:
+
+.. code::
+
+    $ singularity --debug run library://alpine
+    ...
+    DEBUG   [U=1000,P=24473]   loadNativeHooks()             Loaded native hook "poststart.json" ([poststart])
+    DEBUG   [U=1000,P=24473]   run()                         Executing hook "poststart.json" with path "/bin/echo" args [/bin/echo arg1 arg2]
+    DEBUG   [U=1000,P=24473]   Run()                         Hook "poststart.json" STDOUT: arg1 arg2
+    ...
+
+If a ``poststart`` hook fails with a non-zero exit code, a non-fatal ``ERROR``
+message will be displayed to the user. The container has alread been started at
+the point the hook is executed, and will continue to run.
+
+.. code:: 
+
+   $ singularity run docker://alpine
+   INFO:    Using cached SIF image
+   ERROR:   Hook "poststart.json" failed: exit status 1
+   Singularity> 

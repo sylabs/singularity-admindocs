@@ -15,7 +15,7 @@ information about how to use {Singularity}.
 .. toctree::
    :maxdepth: 2
 
-   What's New in {Singularity} 4.5 <new>
+   What's New in {Singularity} 4.6 <new>
 
    Admin Quickstart <admin_quickstart>
    Installing {Singularity} <installation>
@@ -23,5 +23,6 @@ information about how to use {Singularity}.
    User Namespaces & Fakeroot <user_namespace>
    Security in {Singularity} <security>
 
+   Plugins <plugins>
    Appendix <appendix>
    License <license>
