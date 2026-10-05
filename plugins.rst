@@ -75,8 +75,8 @@ The root user can temporarily disable / re-enable the installed plugin:
 To permanently remove the plugin please use your package manager to
 uninstall the ``singularity-ce-log-plugin`` package.
 
-Souce Code
-==========
+Source Code
+===========
 
 Source code for the log plugin can be found in the ``log-plugin`` directory of
 the SingularityCE code.
